@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Printer, ArrowLeft, FileText } from 'lucide-react';
 import { salesApi } from '../api/salesApi';
 import { formatCurrency, formatDate, getPaymentMethodLabel, getPaymentMethodColor } from '../utils/formatters';
@@ -10,6 +10,7 @@ function Invoice({ businessName }) {
   const [sale, setSale] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     async function fetchSale() {
@@ -24,6 +25,15 @@ function Invoice({ businessName }) {
     }
     fetchSale();
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && sale && searchParams.get('autoPrint') === 'true') {
+      // Small timeout to ensure rendering is complete before printing
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+  }, [loading, sale, searchParams]);
 
   if (loading) {
     return (

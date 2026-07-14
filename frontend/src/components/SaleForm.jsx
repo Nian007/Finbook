@@ -73,7 +73,7 @@ function SaleForm() {
       };
       const response = await salesApi.create(payload);
       toast.success('Sale recorded successfully');
-      navigate(`/sales/${response.data.id}`);
+      navigate(`/sales/${response.data.id}?autoPrint=true`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to record sale');
     } finally {

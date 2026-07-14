@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Eye, Trash2, ClipboardList } from 'lucide-react';
+import { Search, Eye, Trash2, ClipboardList, Printer } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { salesApi } from '../api/salesApi';
 import { formatCurrency, formatDate, getPaymentMethodLabel, getPaymentMethodColor } from '../utils/formatters';
@@ -137,6 +137,16 @@ function SalesList() {
                         title="View invoice"
                       >
                         <Eye size={16} />
+                      </button>
+                      <button
+                        className="btn-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/sales/${sale.id}?autoPrint=true`);
+                        }}
+                        title="Print invoice"
+                      >
+                        <Printer size={16} />
                       </button>
                       <button
                         className="btn-icon btn-danger"
