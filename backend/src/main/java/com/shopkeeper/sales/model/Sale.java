@@ -17,6 +17,7 @@ public class Sale {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Business business;
 
     @Column(unique = true, nullable = false)
