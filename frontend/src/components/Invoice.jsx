@@ -4,7 +4,7 @@ import { Printer, ArrowLeft, FileText } from 'lucide-react';
 import { salesApi } from '../api/salesApi';
 import { formatCurrency, formatDate, getPaymentMethodLabel, getPaymentMethodColor } from '../utils/formatters';
 
-function Invoice({ businessName }) {
+function Invoice({ currentUser }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [sale, setSale] = useState(null);
@@ -92,9 +92,8 @@ function Invoice({ businessName }) {
           <div className="invoice-parties">
             <div>
               <h4 className="invoice-party-title">From</h4>
-              <p className="invoice-party-name">{businessName || 'Your Shop'}</p>
-              <p className="invoice-party-detail">123 Market Street</p>
-              <p className="invoice-party-detail">Phone: +91 98765 43210</p>
+              <p className="invoice-party-name">{currentUser?.businessName || 'Your Shop'}</p>
+              <p className="invoice-party-detail">Phone: {currentUser?.phone || 'N/A'}</p>
             </div>
             <div>
               <h4 className="invoice-party-title">To</h4>

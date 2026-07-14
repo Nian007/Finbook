@@ -53,7 +53,7 @@ function App() {
           <Route path="/" element={<Dashboard businessName={businessName} />} />
           <Route path="/new-sale" element={<SaleForm />} />
           <Route path="/sales" element={<SalesList />} />
-          <Route path="/sales/:id" element={<Invoice businessName={businessName} />} />
+          <Route path="/sales/:id" element={<Invoice currentUser={currentUser} />} />
         </Routes>
       </main>
       <Toaster

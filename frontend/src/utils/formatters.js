@@ -12,7 +12,8 @@ export function formatCurrency(amount) {
 
 export function formatDate(dateString) {
   if (!dateString) return '';
-  const date = new Date(dateString);
+  // Append 'Z' to explicitly treat the incoming datetime as UTC
+  const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
   return date.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -25,7 +26,7 @@ export function formatDate(dateString) {
 
 export function formatDateShort(dateString) {
   if (!dateString) return '';
-  const date = new Date(dateString);
+  const date = new Date(dateString + (dateString.endsWith('Z') ? '' : 'Z'));
   return date.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
