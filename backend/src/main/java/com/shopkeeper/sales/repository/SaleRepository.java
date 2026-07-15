@@ -31,4 +31,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     Optional<Sale> findByIdAndBusinessId(Long id, Long businessId);
 
     List<Sale> findTop10ByBusinessIdOrderByCreatedAtDesc(Long businessId);
+
+    @Query("SELECT DISTINCT s.customerName FROM Sale s WHERE s.business.id = :businessId AND s.customerName IS NOT NULL")
+    List<String> findDistinctCustomerNamesByBusinessId(@Param("businessId") Long businessId);
 }
