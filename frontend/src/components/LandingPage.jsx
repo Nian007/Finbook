@@ -21,8 +21,7 @@ const LandingPage = () => {
           <h2>Finbook</h2>
         </div>
         <div className="nav-actions">
-          <button className="btn-secondary" onClick={() => navigate('/login')}>Login</button>
-          <button className="btn-primary" onClick={() => navigate('/login')}>Start Free</button>
+          <button className="btn-outline" onClick={() => navigate('/login')}>Login</button>
         </div>
       </nav>
 
@@ -41,9 +40,6 @@ const LandingPage = () => {
           <div className="hero-ctas">
             <button className="btn-primary large-btn" onClick={() => navigate('/login')}>
               Start Free Now
-            </button>
-            <button className="btn-outline large-btn">
-              <Play size={20} /> Watch Demo
             </button>
           </div>
           <div className="trust-indicators">
