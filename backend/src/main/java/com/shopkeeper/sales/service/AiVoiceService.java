@@ -21,7 +21,7 @@ public class AiVoiceService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Map<String, Object> parseSaleTranscript(String transcript, List<Map<String, Object>> customers, List<Map<String, Object>> products) throws Exception {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
 
         String systemInstruction = """
 You are a data-extraction engine embedded inside a small-business billing app used in India. A shopkeeper taps a mic button in the app and speaks a sale entry in Hindi, Hinglish, or a regional language. The audio has already been transcribed to text by a speech-to-text engine (transcription may contain errors, especially with numbers and proper names).
