@@ -57,8 +57,8 @@ public class AiVoiceService {
                 .dialect(2);
 
         SearchResult result = ops.search(query);
-        if (result.totalResults > 0) {
-            Document doc = result.docs.get(0);
+        if (result.getTotalResults() > 0) {
+            Document doc = result.getDocuments().get(0);
             double score = Double.parseDouble(doc.getString("score"));
             
             // L2 distance score for HNSW. Lower is better. Typically < 0.2 is very similar.
