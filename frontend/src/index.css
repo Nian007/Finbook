@@ -563,6 +563,27 @@ h6 { font-size: var(--text-base); font-weight: 600; }
 .stat-icon.emerald { background: var(--accent-emerald-soft); color: var(--accent-emerald); }
 .stat-icon.crimson { background: var(--accent-crimson-soft); color: var(--accent-crimson); }
 
+.items-total-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .stat-value {
   font-size: var(--text-2xl);
   font-weight: 700;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Save, ShoppingBag } from 'lucide-react';
+import { Plus, Trash2, Save, ShoppingBag, Mic, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { salesApi } from '../api/salesApi';
 import { formatCurrency } from '../utils/formatters';
@@ -17,6 +17,103 @@ function SaleForm() {
     notes: '',
   });
   const [items, setItems] = useState([{ ...emptyItem }]);
+
+  // Voice AI States
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [aiParsing, setAiParsing] = useState(false);
+
+  const startListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Voice recognition is not supported in this browser. Try Chrome or Android.');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'hi-IN'; // Works for Hindi and Hinglish
+    recognition.interimResults = true;
+    
+    recognition.onstart = () => {
+      setIsListening(true);
+      setTranscript('');
+    };
+
+    recognition.onresult = (event) => {
+      let currentTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      setTranscript(currentTranscript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error(event.error);
+      setIsListening(false);
+      toast.error('Voice recording error. Please try again.');
+    };
+
+    recognition.onend = async () => {
+      setIsListening(false);
+      
+      // If we have a transcript, parse it
+      if (transcript.trim() || recognition.finalTranscript) {
+         // use the final state transcript from the component if available, else try to get it
+         const finalTranscript = transcript.trim();
+         if (!finalTranscript) return;
+
+         setAiParsing(true);
+         try {
+            const response = await salesApi.parseVoice(finalTranscript);
+            const data = response.data;
+            
+            // Auto-fill form
+            if (data.customer) {
+               setForm(prev => ({
+                 ...prev,
+                 customerName: data.customer.matched_name || data.customer.raw_spoken_name || prev.customerName
+               }));
+            }
+            
+            if (data.items && data.items.length > 0) {
+               const parsedItems = data.items.map(item => ({
+                  productName: item.matched_product_name || item.raw_spoken_item || '',
+                  quantity: item.quantity || 1,
+                  unitPrice: item.unit_price_used || 0
+               }));
+               setItems(parsedItems);
+            }
+            
+            if (data.payment) {
+               let method = 'CASH';
+               if (data.payment.payment_status === 'unpaid') {
+                   setForm(prev => ({ ...prev, notes: (prev.notes ? prev.notes + ' | ' : '') + 'UNPAID' }));
+               }
+               // Note: amount_paid is useful but we don't track partial payments in the basic DB yet, we just track totalAmount via items.
+            }
+            
+            if (data.notes) {
+               setForm(prev => ({ ...prev, notes: (prev.notes ? prev.notes + '\nAI Note: ' : 'AI Note: ') + data.notes }));
+            }
+            
+            if (data.needs_review) {
+               toast.success('AI loaded details, but needs your review before saving!', { duration: 5000, icon: '⚠️' });
+            } else {
+               toast.success('AI matched everything perfectly!');
+            }
+
+         } catch (e) {
+            console.error(e);
+            toast.error('AI failed to parse the voice sale.');
+         } finally {
+            setAiParsing(false);
+            setTranscript('');
+         }
+      }
+    };
+
+    recognition.start();
+  };
 
   const updateForm = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -83,9 +180,33 @@ function SaleForm() {
 
   return (
     <div className="page-container animate-fade-in-up">
-      <div className="page-header">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">Record New Sale</h1>
+        
+        <button 
+          onClick={startListening} 
+          disabled={isListening || aiParsing}
+          className={`btn ${isListening ? 'btn-danger' : 'btn-primary'}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', animation: isListening ? 'pulse 1.5s infinite' : 'none' }}
+        >
+          {aiParsing ? <Loader className="spin" size={18} /> : <Mic size={18} />}
+          {aiParsing ? 'AI is thinking...' : isListening ? 'Listening...' : 'Record Voice Sale'}
+        </button>
       </div>
+      
+      {(isListening || transcript || aiParsing) && (
+         <div className="card" style={{ marginBottom: '20px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6' }}>
+            <div style={{ padding: '15px' }}>
+               <h4 style={{ margin: '0 0 10px 0', color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Mic size={16} /> 
+                  {isListening ? 'Speak now (Hindi/Hinglish)...' : 'Processing voice...'}
+               </h4>
+               <p style={{ margin: 0, fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                  {transcript || '...'}
+               </p>
+            </div>
+         </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="card">

@@ -61,5 +61,6 @@ export const salesApi = {
   create: (data) => api.post('', data),
   delete: (id) => api.delete(`/${id}`),
   search: (query) => api.get(`/search?query=${encodeURIComponent(query)}`),
-  getStats: () => api.get('/stats')
+  getStats: () => api.get('/stats'),
+  parseVoice: (transcript) => api.post('/voice-parse', { transcript })
 };
