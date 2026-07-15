@@ -20,7 +20,7 @@ public class AiVoiceService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, Object> parseSaleTranscript(String transcript, List<String> customers, List<Map<String, Object>> products) throws Exception {
+    public Map<String, Object> parseSaleTranscript(String transcript, List<Map<String, Object>> customers, List<Map<String, Object>> products) throws Exception {
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
         String systemInstruction = """
