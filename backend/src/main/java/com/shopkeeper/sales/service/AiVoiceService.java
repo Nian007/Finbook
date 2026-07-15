@@ -167,10 +167,11 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
     }
 
     private float[] getEmbedding(String text) throws Exception {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/embedding-001:embedContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=" + apiKey;
         Map<String, Object> requestBody = Map.of(
-            "model", "models/embedding-001",
-            "content", Map.of("parts", List.of(Map.of("text", text)))
+            "model", "models/gemini-embedding-001",
+            "content", Map.of("parts", List.of(Map.of("text", text))),
+            "outputDimensionality", 768
         );
 
         HttpHeaders headers = new HttpHeaders();
