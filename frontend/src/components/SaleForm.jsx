@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Save, ShoppingBag, Mic, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -21,6 +21,7 @@ function SaleForm() {
   // Voice AI States
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const transcriptRef = useRef('');
   const [aiParsing, setAiParsing] = useState(false);
 
   const startListening = () => {
@@ -37,6 +38,7 @@ function SaleForm() {
     recognition.onstart = () => {
       setIsListening(true);
       setTranscript('');
+      transcriptRef.current = '';
     };
 
     recognition.onresult = (event) => {
@@ -45,6 +47,7 @@ function SaleForm() {
         currentTranscript += event.results[i][0].transcript;
       }
       setTranscript(currentTranscript);
+      transcriptRef.current = currentTranscript;
     };
 
     recognition.onerror = (event) => {
@@ -56,11 +59,8 @@ function SaleForm() {
     recognition.onend = async () => {
       setIsListening(false);
       
-      // If we have a transcript, parse it
-      if (transcript.trim() || recognition.finalTranscript) {
-         // use the final state transcript from the component if available, else try to get it
-         const finalTranscript = transcript.trim();
-         if (!finalTranscript) return;
+      const finalTranscript = transcriptRef.current.trim();
+      if (!finalTranscript) return;
 
          setAiParsing(true);
          try {

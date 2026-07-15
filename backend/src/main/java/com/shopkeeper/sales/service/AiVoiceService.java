@@ -54,12 +54,11 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
   "payment": {
     "amount_paid": <number or null>,
     "computed_total": <sum of line_totals, or null if items unmatched>,
-    "payment_status": "full" | "partial" | "unpaid" | "unclear",
-    "discrepancy_flag": <true if amount_paid and computed_total differ by more than 10%, or if unclear>
+    "payment_status": "full" | "partial" | "unpaid" | "unclear"
   },
-  "notes": <string, English, explain anything ambiguous, mismatched, or assumptions made>,
+  "notes": <string, English, explain anything ambiguous or assumptions made>,
   "overall_confidence": "high" | "medium" | "low",
-  "needs_review": <true if any field has confidence "low", any is_new is true, or discrepancy_flag is true>
+  "needs_review": <true if any field has confidence "low", any is_new is true, or price is 0>
 }
 
 ## Extraction rules:
@@ -67,12 +66,12 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
 1. Convert spoken Hindi numbers (ek, do, teen, chaar, paanch, das, sau, hazaar, dedh, ढाई etc.) to numerals.
 2. Common payment phrases: "diya/diye/de diya" = paid this amount. "aadha diya" = partial, roughly 50%. "udhaar" / "baad mein dega" = unpaid, full amount is due.
 3. If quantity is not stated, default to 1.
-4. If multiple items are mentioned in one sentence, split into separate entries in the "items" array.
+4. If multiple items are mentioned in one sentence (e.g. 2 chips, 4 soap, 1 ajwain), MUST split into separate distinct entries in the "items" array.
 5. Match spoken item/customer names to the CLOSEST entry in the provided lists, even with imperfect phonetic overlap.
-6. If no reasonable match exists, set matched_id to null, is_new to true, and preserve the raw spoken text — do NOT invent a database ID.
-7. Always compute line_total = quantity × unit_price_used when a product is matched, so it can be checked against amount_paid.
-8. If amount_paid and computed_total disagree significantly, don't silently pick one — set discrepancy_flag true and explain the mismatch in "notes".
-9. Never guess a customer or product into existence with a fabricated ID. Ambiguity is always surfaced via is_new / low confidence / needs_review, never silently resolved.
+6. Trust the shopkeeper implicitly. If they say an item costs a certain amount, or pay a certain amount, that is the absolute truth. DO NOT add notes questioning the price or flagging discrepancies.
+7. If no reasonable match exists in the database, set matched_id to null, is_new to true, and preserve the raw spoken text.
+8. If the price is missing and not found in the DB, leave it as 0 and set needs_review to true so the user can fill it in.
+9. Never guess a customer or product into existence with a fabricated ID. Ambiguity is always surfaced via is_new / low confidence / needs_review.
 """;
 
         String userPrompt = String.format("TRANSCRIPT: %s\n\nPRODUCT_LIST: %s\n\nCUSTOMER_LIST: %s", 
