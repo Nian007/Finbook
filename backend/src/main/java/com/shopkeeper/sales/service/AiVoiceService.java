@@ -75,7 +75,7 @@ public class AiVoiceService {
         }
 
         // 4. Extraction (Cache Miss or Verification Failed)
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
         String systemInstruction = """
 You are a data-extraction engine embedded inside a small-business billing app used in India. A shopkeeper taps a mic button in the app and speaks a sale entry in Hindi, Hinglish, or a regional language. The audio has already been transcribed to text by a speech-to-text engine (transcription may contain errors, especially with numbers and proper names).
@@ -167,9 +167,8 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
     }
 
     private float[] getEmbedding(String text) throws Exception {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=" + apiKey;
         Map<String, Object> requestBody = Map.of(
-            "model", "models/gemini-embedding-001",
             "content", Map.of("parts", List.of(Map.of("text", text))),
             "outputDimensionality", 768
         );
@@ -193,7 +192,7 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
 
     private boolean isIdenticalIntent(String original, String incoming) {
         try {
-            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
             String prompt = String.format("Compare these two transcripts representing sales entries. Are they strictly identical in terms of names, item names, and quantities (ignoring minor conversational filler)? Reply ONLY 'IDENTICAL' or 'DIFFERENT'.\nOriginal: %s\nIncoming: %s", original, incoming);
             
             Map<String, Object> requestBody = Map.of(
