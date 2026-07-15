@@ -5,7 +5,7 @@ import com.redis.om.spring.annotations.Indexed;
 import com.redis.om.spring.annotations.SchemaFieldType;
 import org.springframework.data.annotation.Id;
 import redis.clients.jedis.search.schemafields.VectorField.VectorAlgorithm;
-import redis.clients.jedis.search.schemafields.VectorField.VectorType;
+import com.redis.om.spring.VectorType;
 
 @Document
 public class CachedSale {
