@@ -109,7 +109,6 @@ function SaleForm() {
             setAiParsing(false);
             setTranscript('');
          }
-      }
     };
 
     recognition.start();
