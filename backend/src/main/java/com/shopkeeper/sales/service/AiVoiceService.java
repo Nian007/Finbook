@@ -1,6 +1,14 @@
 package com.shopkeeper.sales.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redis.om.spring.ops.RedisModulesOperations;
+import com.redis.om.spring.ops.search.SearchOperations;
+import com.shopkeeper.sales.model.CachedSale;
+import com.shopkeeper.sales.repository.CachedSaleRepository;
+import io.redisearch.Query;
+import io.redisearch.SearchResult;
+import io.redisearch.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +30,51 @@ public class AiVoiceService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
+    private CachedSaleRepository cachedSaleRepository;
+
+    @Autowired
+    private RedisModulesOperations<String> modulesOperations;
+
     public Map<String, Object> parseSaleTranscript(String transcript, List<Map<String, Object>> customers, List<Map<String, Object>> products) throws Exception {
+        // 1. Generate Embedding
+        float[] embedding = getEmbedding(transcript);
+
+        // 2. Vector Search
+        SearchOperations<String> ops = modulesOperations.opsForSearch("com.shopkeeper.sales.model.CachedSaleIdx");
+        
+        // Convert float[] to byte[] for Redis query
+        ByteBuffer buffer = ByteBuffer.allocate(embedding.length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        for (float f : embedding) {
+            buffer.putFloat(f);
+        }
+        byte[] vectorBytes = buffer.array();
+
+        Query query = new Query("*=>[KNN 1 @transcriptEmbedding $vec AS score]")
+                .addParam("vec", vectorBytes)
+                .returnFields("id", "transcript", "jsonResponse", "score")
+                .setSortBy("score", true)
+                .dialect(2);
+
+        SearchResult result = ops.search(query);
+        if (result.totalResults > 0) {
+            Document doc = result.docs.get(0);
+            double score = Double.parseDouble(doc.getString("score"));
+            
+            // L2 distance score for HNSW. Lower is better. Typically < 0.2 is very similar.
+            // Wait, Gemini uses Cosine Similarity by default. Let's assume < 0.15 distance is a strong match.
+            if (score < 0.15) {
+                String cachedTranscript = doc.getString("transcript");
+                String cachedJson = doc.getString("jsonResponse");
+                
+                // 3. Verification Layer
+                if (isIdenticalIntent(cachedTranscript, transcript)) {
+                    return objectMapper.readValue(cachedJson, Map.class);
+                }
+            }
+        }
+
+        // 4. Extraction (Cache Miss or Verification Failed)
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
 
         String systemInstruction = """
@@ -87,7 +141,6 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(requestBody), headers);
 
         String responseStr = restTemplate.postForObject(url, request, String.class);
@@ -101,10 +154,69 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
             if (parts != null && !parts.isEmpty()) {
                 String jsonResult = (String) parts.get(0).get("text");
                 jsonResult = jsonResult.replaceAll("(?s)^```json\\s*", "").replaceAll("(?s)```\\s*$", "");
+                
+                // Cache the new sale
+                CachedSale newCache = new CachedSale(transcript, embedding, jsonResult);
+                cachedSaleRepository.save(newCache);
+                
                 return objectMapper.readValue(jsonResult, Map.class);
             }
         }
         
         throw new RuntimeException("Failed to extract JSON from Gemini response");
+    }
+
+    private float[] getEmbedding(String text) throws Exception {
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=" + apiKey;
+        Map<String, Object> requestBody = Map.of(
+            "model", "models/text-embedding-004",
+            "content", Map.of("parts", List.of(Map.of("text", text)))
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(requestBody), headers);
+
+        String responseStr = restTemplate.postForObject(url, request, String.class);
+        Map<String, Object> root = objectMapper.readValue(responseStr, Map.class);
+        
+        Map<String, Object> embeddingNode = (Map<String, Object>) root.get("embedding");
+        List<Double> values = (List<Double>) embeddingNode.get("values");
+        
+        float[] floatValues = new float[values.size()];
+        for (int i = 0; i < values.size(); i++) {
+            floatValues[i] = values.get(i).floatValue();
+        }
+        return floatValues;
+    }
+
+    private boolean isIdenticalIntent(String original, String incoming) {
+        try {
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
+            String prompt = String.format("Compare these two transcripts representing sales entries. Are they strictly identical in terms of names, item names, and quantities (ignoring minor conversational filler)? Reply ONLY 'IDENTICAL' or 'DIFFERENT'.\nOriginal: %s\nIncoming: %s", original, incoming);
+            
+            Map<String, Object> requestBody = Map.of(
+                "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt))))
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(requestBody), headers);
+
+            String responseStr = restTemplate.postForObject(url, request, String.class);
+            Map<String, Object> root = objectMapper.readValue(responseStr, Map.class);
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) root.get("candidates");
+            if (candidates != null && !candidates.isEmpty()) {
+                Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
+                List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
+                if (parts != null && !parts.isEmpty()) {
+                    String result = (String) parts.get(0).get("text");
+                    return result.trim().toUpperCase().contains("IDENTICAL");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
