@@ -156,7 +156,7 @@ public class SubscriptionController {
     private boolean isSuperAdmin() {
         CustomUserDetails user = getCurrentUser();
         return user.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_super_admin"));
+            .anyMatch(a -> a.getAuthority().equals("ROLE_SUPER_ADMIN"));
     }
 
     private Map<String, Object> toAdminDto(Subscription sub) {
