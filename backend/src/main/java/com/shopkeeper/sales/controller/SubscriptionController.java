@@ -144,7 +144,20 @@ public class SubscriptionController {
     public ResponseEntity<?> getAuditLog() {
         if (!isSuperAdmin()) return ResponseEntity.status(403).body(Map.of("message", "Access denied"));
         List<SubscriptionAuditLog> logs = subscriptionService.getAuditLog();
-        return ResponseEntity.ok(logs);
+        List<Map<String, Object>> result = logs.stream().map(log -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("id", log.getId());
+            m.put("timestamp", log.getTimestamp());
+            if (log.getSubscription() != null) {
+                m.put("subscription", Map.of("id", log.getSubscription().getId()));
+            }
+            m.put("previousStatus", log.getPreviousStatus());
+            m.put("newStatus", log.getNewStatus());
+            m.put("performedByPhone", log.getPerformedByPhone());
+            m.put("note", log.getNote());
+            return m;
+        }).toList();
+        return ResponseEntity.ok(result);
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────────
