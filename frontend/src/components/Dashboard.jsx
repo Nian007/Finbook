@@ -11,7 +11,7 @@ function getGreeting() {
   return 'Good evening';
 }
 
-function Dashboard({ businessName }) {
+function Dashboard({ businessName, subStatus }) {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recentSales, setRecentSales] = useState([]);
@@ -52,6 +52,14 @@ function Dashboard({ businessName }) {
 
   return (
     <div className="page-container">
+      {/* 24h Expiry Warning Banner */}
+      {subStatus?.expiresWithin24h && (
+        <div className="expiry-banner">
+          ⚠️ Your subscription expires tomorrow!{' '}
+          <Link to="/subscribe" className="expiry-banner-link">Renew now →</Link>
+        </div>
+      )}
+
       <div className="page-header animate-fade-in-up">
         <p className="page-greeting">{getGreeting()}{businessName ? `, ${businessName}` : ''}</p>
         <h1 className="page-title">Dashboard</h1>

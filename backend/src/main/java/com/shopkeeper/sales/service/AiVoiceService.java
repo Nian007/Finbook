@@ -37,41 +37,43 @@ public class AiVoiceService {
     private RedisModulesOperations<String> modulesOperations;
 
     public Map<String, Object> parseSaleTranscript(String transcript, List<Map<String, Object>> customers, List<Map<String, Object>> products) throws Exception {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new RuntimeException("GEMINI_API_KEY is not configured. Please set it in your environment variables.");
+        }
+
         // 1. Generate Embedding
         float[] embedding = getEmbedding(transcript);
 
-        // 2. Vector Search
-        SearchOperations<String> ops = modulesOperations.opsForSearch("com.shopkeeper.sales.model.CachedSaleIdx");
-        
-        // Convert float[] to byte[] for Redis query
-        ByteBuffer buffer = ByteBuffer.allocate(embedding.length * 4).order(ByteOrder.LITTLE_ENDIAN);
-        for (float f : embedding) {
-            buffer.putFloat(f);
-        }
-        byte[] vectorBytes = buffer.array();
-
-        Query query = new Query("*=>[KNN 1 @transcriptEmbedding $vec AS score]")
-                .addParam("vec", vectorBytes)
-                .returnFields("id", "transcript", "jsonResponse", "score")
-                .setSortBy("score", true)
-                .dialect(2);
-
-        SearchResult result = ops.search(query);
-        if (result.getTotalResults() > 0) {
-            Document doc = result.getDocuments().get(0);
-            double score = Double.parseDouble(doc.getString("score"));
+        // 2. Vector Search (Redis cache — best effort, graceful fallback to Gemini if unavailable)
+        try {
+            SearchOperations<String> ops = modulesOperations.opsForSearch("com.shopkeeper.sales.model.CachedSaleIdx");
             
-            // L2 distance score for HNSW. Lower is better. Typically < 0.2 is very similar.
-            // Wait, Gemini uses Cosine Similarity by default. Let's assume < 0.15 distance is a strong match.
-            if (score < 0.15) {
-                String cachedTranscript = doc.getString("transcript");
-                String cachedJson = doc.getString("jsonResponse");
-                
-                // 3. Verification Layer
-                if (isIdenticalIntent(cachedTranscript, transcript)) {
-                    return objectMapper.readValue(cachedJson, Map.class);
+            ByteBuffer buffer = ByteBuffer.allocate(embedding.length * 4).order(ByteOrder.LITTLE_ENDIAN);
+            for (float f : embedding) {
+                buffer.putFloat(f);
+            }
+            byte[] vectorBytes = buffer.array();
+
+            Query query = new Query("*=>[KNN 1 @transcriptEmbedding $vec AS score]")
+                    .addParam("vec", vectorBytes)
+                    .returnFields("id", "transcript", "jsonResponse", "score")
+                    .setSortBy("score", true)
+                    .dialect(2);
+
+            SearchResult result = ops.search(query);
+            if (result.getTotalResults() > 0) {
+                Document doc = result.getDocuments().get(0);
+                double score = Double.parseDouble(doc.getString("score"));
+                if (score < 0.15) {
+                    String cachedTranscript = doc.getString("transcript");
+                    String cachedJson = doc.getString("jsonResponse");
+                    if (isIdenticalIntent(cachedTranscript, transcript)) {
+                        return objectMapper.readValue(cachedJson, Map.class);
+                    }
                 }
             }
+        } catch (Exception redisEx) {
+            System.out.println("[VoiceCache] Redis unavailable, skipping cache: " + redisEx.getMessage());
         }
 
         // 4. Extraction (Cache Miss or Verification Failed)
