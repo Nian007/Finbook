@@ -129,4 +129,49 @@ public class AuthService {
         User user = userRepository.findById(userId).orElseThrow();
         refreshTokenRepository.deleteAllByUser(user);
     }
+
+    @Autowired
+    private EmailService emailService;
+
+    @Transactional
+    public void forgotPassword(String phone) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("No account found with this phone number."));
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("No email address associated with this account. Please contact support.");
+        }
+
+        // Generate 4 digit OTP
+        String otp = String.format("%04d", new java.util.Random().nextInt(10000));
+        
+        user.setResetOtp(otp);
+        user.setResetOtpExpiry(java.time.LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        emailService.sendSimpleMessage(
+            user.getEmail(), 
+            "Finbook Password Reset OTP", 
+            "Your password reset OTP is: " + otp + "\n\nThis code will expire in 10 minutes."
+        );
+    }
+
+    @Transactional
+    public void resetPassword(String phone, String otp, String newPassword) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("No account found with this phone number."));
+
+        if (user.getResetOtp() == null || !user.getResetOtp().equals(otp)) {
+            throw new RuntimeException("Invalid OTP.");
+        }
+
+        if (user.getResetOtpExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("OTP has expired.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setResetOtp(null);
+        user.setResetOtpExpiry(null);
+        userRepository.save(user);
+    }
 }

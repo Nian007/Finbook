@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { Store, User, Phone, Lock, ChevronRight, Mail } from 'lucide-react';
-import { login, signup } from '../api/authApi';
+import { login, signup, forgotPassword, resetPassword } from '../api/authApi';
 import toast from 'react-hot-toast';
 
 const BusinessLogin = ({ onLogin }) => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [viewMode, setViewMode] = useState('login'); // 'login', 'signup', 'forgot', 'reset'
   const [formData, setFormData] = useState({
     businessName: '',
     ownerName: '',
     phone: '',
     password: '',
-    email: ''
+    email: '',
+    otp: '',
+    newPassword: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,17 +21,25 @@ const BusinessLogin = ({ onLogin }) => {
     setIsLoading(true);
     
     try {
-      if (isLogin) {
+      if (viewMode === 'login') {
         const data = await login(formData.phone, formData.password);
         toast.success(`Welcome back, ${data.name}!`);
         onLogin(data);
-      } else {
+      } else if (viewMode === 'signup') {
         await signup(formData);
         toast.success('Registration successful! Please login.');
-        setIsLogin(true); // Switch to login view
+        setViewMode('login');
+      } else if (viewMode === 'forgot') {
+        await forgotPassword(formData.phone);
+        toast.success('OTP sent to your email!');
+        setViewMode('reset');
+      } else if (viewMode === 'reset') {
+        await resetPassword(formData.phone, formData.otp, formData.newPassword);
+        toast.success('Password reset successfully! Please login.');
+        setViewMode('login');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Authentication failed');
+      toast.error(error.response?.data?.message || 'Action failed');
     } finally {
       setIsLoading(false);
     }
@@ -47,12 +57,20 @@ const BusinessLogin = ({ onLogin }) => {
               <Store />
             </div>
           </div>
-          <h1 className="login-title">{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
-          <p className="login-subtitle">{isLogin ? 'Sign in to access your dashboard' : 'Register your business to get started'}</p>
+          <h1 className="login-title">
+            {viewMode === 'login' ? 'Welcome Back' : 
+             viewMode === 'signup' ? 'Create Account' : 
+             viewMode === 'forgot' ? 'Reset Password' : 'Enter OTP'}
+          </h1>
+          <p className="login-subtitle">
+            {viewMode === 'login' ? 'Sign in to access your dashboard' : 
+             viewMode === 'signup' ? 'Register your business to get started' : 
+             viewMode === 'forgot' ? 'Enter your phone number to receive an OTP' : 'Enter the OTP sent to your email'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-          {!isLogin && (
+          {viewMode === 'signup' && (
             <>
               <div className="login-input-group">
                 <input
@@ -75,7 +93,8 @@ const BusinessLogin = ({ onLogin }) => {
               <div className="login-input-group">
                 <input
                   type="email"
-                  placeholder="Email (Optional)"
+                  placeholder="Email (Required for password reset)"
+                  required
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
@@ -83,30 +102,76 @@ const BusinessLogin = ({ onLogin }) => {
             </>
           )}
           
-          <div className="login-input-group">
-            <input
-              type="tel"
-              placeholder="Phone Number (10 digits)"
-              required
-              pattern="[0-9]{10}"
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            />
-          </div>
+          {(viewMode === 'login' || viewMode === 'signup' || viewMode === 'forgot') && (
+            <div className="login-input-group">
+              <input
+                type="tel"
+                placeholder="Phone Number (10 digits)"
+                required
+                pattern="[0-9]{10}"
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
+            </div>
+          )}
 
-          <div className="login-input-group">
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              minLength={8}
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-            />
-          </div>
+          {(viewMode === 'login' || viewMode === 'signup') && (
+            <div className="login-input-group">
+              <input
+                type="password"
+                placeholder="Password"
+                required
+                minLength={8}
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
+            </div>
+          )}
+
+          {viewMode === 'reset' && (
+            <>
+              <div className="login-input-group">
+                <input
+                  type="text"
+                  placeholder="Enter 4-digit OTP"
+                  required
+                  pattern="[0-9]{4}"
+                  value={formData.otp}
+                  onChange={(e) => setFormData({...formData, otp: e.target.value})}
+                />
+              </div>
+              <div className="login-input-group">
+                <input
+                  type="password"
+                  placeholder="New Password (min 8 chars)"
+                  required
+                  minLength={8}
+                  value={formData.newPassword}
+                  onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                />
+              </div>
+            </>
+          )}
+
+          {viewMode === 'login' && (
+            <div style={{ textAlign: 'right', marginTop: '-10px', marginBottom: '10px' }}>
+              <button 
+                type="button" 
+                className="btn-link" 
+                style={{ fontSize: '0.85rem' }}
+                onClick={() => setViewMode('forgot')}
+              >
+                Forgot Password?
+              </button>
+            </div>
+          )}
 
           <button type="submit" className="btn btn-primary btn-full mt-4" disabled={isLoading}>
-            {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Register')}
+            {isLoading ? 'Processing...' : (
+              viewMode === 'login' ? 'Sign In' : 
+              viewMode === 'signup' ? 'Register' : 
+              viewMode === 'forgot' ? 'Send OTP' : 'Reset Password'
+            )}
             <ChevronRight className="h-5 w-5 ml-2" />
           </button>
         </form>
@@ -115,9 +180,9 @@ const BusinessLogin = ({ onLogin }) => {
           <button 
             type="button" 
             className="btn-link"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => setViewMode(viewMode === 'login' ? 'signup' : 'login')}
           >
-            {isLogin ? "Don't have an account? Register" : "Already have an account? Sign In"}
+            {viewMode === 'login' ? "Don't have an account? Register" : "Back to Sign In"}
           </button>
         </div>
       </div>

@@ -105,4 +105,32 @@ public class AuthController {
             return ResponseEntity.ok("Logged out locally"); // Might not have a valid context if token expired
         }
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody com.shopkeeper.sales.dto.ForgotPasswordRequest request) {
+        try {
+            authService.forgotPassword(request.getPhone());
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "OTP sent successfully");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody com.shopkeeper.sales.dto.ResetPasswordRequest request) {
+        try {
+            authService.resetPassword(request.getPhone(), request.getOtp(), request.getNewPassword());
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Password reset successfully");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

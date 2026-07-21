@@ -34,6 +34,10 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    private String resetOtp;
+
+    private LocalDateTime resetOtpExpiry;
+
     @PrePersist
     public void prePersist() {
         if (this.createdAt == null) {
@@ -111,5 +115,21 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getResetOtp() {
+        return resetOtp;
+    }
+
+    public void setResetOtp(String resetOtp) {
+        this.resetOtp = resetOtp;
+    }
+
+    public LocalDateTime getResetOtpExpiry() {
+        return resetOtpExpiry;
+    }
+
+    public void setResetOtpExpiry(LocalDateTime resetOtpExpiry) {
+        this.resetOtpExpiry = resetOtpExpiry;
     }
 }

@@ -25,6 +25,16 @@ export const logout = async () => {
     localStorage.removeItem('user');
 };
 
+export const forgotPassword = async (phone) => {
+    const response = await axios.post(`${API_URL}/forgot-password`, { phone });
+    return response.data;
+};
+
+export const resetPassword = async (phone, otp, newPassword) => {
+    const response = await axios.post(`${API_URL}/reset-password`, { phone, otp, newPassword });
+    return response.data;
+};
+
 export const getCurrentUser = () => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
