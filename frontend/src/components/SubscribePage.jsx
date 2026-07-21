@@ -64,12 +64,27 @@ export default function SubscribePage() {
       </div>
 
       {/* Current status banner */}
-      {status && !status.isAllowed && status.status !== 'NONE' && (
-        <div className="sub-status-banner warning">
-          Your subscription is <strong>{status.status.replace('_', ' ')}</strong>.
-          {status.status === 'PENDING_VERIFICATION' && status.utrNumber &&
-            ' UTR submitted, waiting for admin approval.'}
-        </div>
+      {status && (
+        <>
+          {/* Active/Trial banner */}
+          {status.isAllowed && (
+            <div className="sub-status-banner success" style={{ background: 'rgba(38, 194, 129, 0.1)', border: '1px solid #26C281', color: '#26C281', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
+              <h3>✅ Active Subscription</h3>
+              <p>You are currently on the <strong>{status.planName}</strong> plan.</p>
+              <p>Your access is valid until: <strong>{new Date(status.endDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</strong></p>
+              <p style={{ marginTop: '8px', fontSize: '0.9rem', opacity: 0.8 }}>You can choose a plan below to extend your subscription.</p>
+            </div>
+          )}
+
+          {/* Blocked/Pending banner */}
+          {!status.isAllowed && status.status !== 'NONE' && (
+            <div className="sub-status-banner warning">
+              Your subscription is <strong>{status.status.replace('_', ' ')}</strong>.
+              {status.status === 'PENDING_VERIFICATION' && status.utrNumber &&
+                ' UTR submitted, waiting for admin approval.'}
+            </div>
+          )}
+        </>
       )}
 
       {/* Step: Plan Selection */}
