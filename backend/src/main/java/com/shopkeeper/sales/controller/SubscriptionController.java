@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @RestController
 @CrossOrigin(origins = "*")
 public class SubscriptionController {
@@ -95,6 +97,7 @@ public class SubscriptionController {
     // ─── Admin: List pending verifications ───────────────────────────────────────
 
     @GetMapping("/api/admin/subscriptions/pending")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getPending() {
         if (!isSuperAdmin()) return ResponseEntity.status(403).body(Map.of("message", "Access denied"));
         List<Subscription> subs = subscriptionService.getPendingVerifications();
@@ -141,6 +144,7 @@ public class SubscriptionController {
     // ─── Admin: Audit log ────────────────────────────────────────────────────────
 
     @GetMapping("/api/admin/subscriptions/audit-log")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getAuditLog() {
         if (!isSuperAdmin()) return ResponseEntity.status(403).body(Map.of("message", "Access denied"));
         List<SubscriptionAuditLog> logs = subscriptionService.getAuditLog();
