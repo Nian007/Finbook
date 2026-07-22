@@ -68,15 +68,16 @@ Your job: convert the transcript into a structured JSON sale record, matched aga
 ## Extraction rules:
 
 1. Convert spoken Hindi numbers (ek, do, teen, chaar, paanch, das, sau, hazaar, dedh, ढाई etc.) to numerals.
-2. TRANSLATE all extracted product names, items, customer names, and notes into English for the JSON output. Do NOT output Hindi/Hinglish words in the JSON if an English equivalent exists (e.g. "sabun" -> "soap").
-3. Common payment phrases: "diya/diye/de diya" = paid this amount. "aadha diya" = partial, roughly 50%. "udhaar" / "baad mein dega" = unpaid, full amount is due.
-4. If quantity is not stated, default to 1.
-5. If multiple items are mentioned in one sentence (e.g. 2 chips, 4 soap, 1 ajwain), MUST split into separate distinct entries in the "items" array.
-6. Match spoken item/customer names to the CLOSEST entry in the provided lists, even with imperfect phonetic overlap.
-7. Trust the shopkeeper implicitly. If they say an item costs a certain amount, or pay a certain amount, that is absolute truth. DO NOT add notes questioning the price.
-8. If no reasonable match exists in the database, set matched_id to null, is_new to true, and preserve the raw spoken text (translated to English).
-9. If the price is missing and not found in the DB, leave it as 0 and set needs_review to true.
-10. Never guess a customer or product into existence with a fabricated ID. Ambiguity is always surfaced via is_new / low confidence / needs_review.
+2. If the spoken text combines a number word with a product (e.g., "ek dawai", "do chips"), STRICTLY separate them! "ek" becomes quantity 1, and "dawai" becomes the product name (translated to "Medicine"). Do NOT leave the number word inside the raw_spoken_item.
+3. TRANSLATE all extracted product names, items, customer names, and notes into English for the JSON output. Do NOT output Hindi/Hinglish words in the JSON if an English equivalent exists (e.g. "sabun" -> "soap", "dawai" -> "medicine").
+4. Common payment phrases: "diya/diye/de diya" = paid this amount. "aadha diya" = partial, roughly 50%. "udhaar" / "baad mein dega" = unpaid, full amount is due.
+5. If quantity is not stated, default to 1.
+6. If multiple items are mentioned in one sentence (e.g. 2 chips, 4 soap, 1 ajwain), MUST split into separate distinct entries in the "items" array.
+7. Match spoken item/customer names to the CLOSEST entry in the provided lists, even with imperfect phonetic overlap.
+8. Trust the shopkeeper implicitly. If they say an item costs a certain amount, or pay a certain amount, that is absolute truth. DO NOT add notes questioning the price.
+9. If no reasonable match exists in the database, set matched_id to null, is_new to true, and preserve the raw spoken text (translated to English).
+10. If the price is missing and not found in the DB, leave it as 0 and set needs_review to true.
+11. Never guess a customer or product into existence with a fabricated ID. Ambiguity is always surfaced via is_new / low confidence / needs_review.
 """;
 
         String userPrompt = String.format("TRANSCRIPT: %s\n\nPRODUCT_LIST: %s\n\nCUSTOMER_LIST: %s", 
