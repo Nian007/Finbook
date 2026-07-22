@@ -60,6 +60,20 @@ public class AuthService {
         business.setBusinessName(signUpRequest.getBusinessName());
         business.setOwnerName(signUpRequest.getOwnerName());
         business.setPhone(signUpRequest.getPhone());
+        business.setAddress(signUpRequest.getAddress());
+        
+        // Tax Profile Fields
+        business.setPan(signUpRequest.getPan());
+        business.setAadhaar(signUpRequest.getAadhaar());
+        business.setDob(signUpRequest.getDob());
+        business.setBusinessStatus(signUpRequest.getBusinessStatus());
+        business.setPinCode(signUpRequest.getPinCode());
+        business.setGstin(signUpRequest.getGstin());
+        business.setBankAccountNumber(signUpRequest.getBankAccountNumber());
+        business.setBankIfsc(signUpRequest.getBankIfsc());
+        business.setBankName(signUpRequest.getBankName());
+        business.setNatureOfBusiness(signUpRequest.getNatureOfBusiness());
+        
         businessRepository.save(business);
 
         User user = new User();

@@ -22,6 +22,18 @@ public class SignupRequest {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
+    private String address;
+    private String pan;
+    private String aadhaar;
+    private java.time.LocalDate dob;
+    private String businessStatus;
+    private String pinCode;
+    private String gstin;
+    private String bankAccountNumber;
+    private String bankIfsc;
+    private String bankName;
+    private String natureOfBusiness;
+
     public String getBusinessName() {
         return businessName;
     }

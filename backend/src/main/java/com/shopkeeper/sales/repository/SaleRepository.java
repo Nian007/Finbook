@@ -40,4 +40,10 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     @Query("SELECT DISTINCT s.customerName FROM Sale s WHERE s.business.id = :businessId AND s.customerName IS NOT NULL")
     List<String> findDistinctCustomerNamesByBusinessId(@Param("businessId") Long businessId);
+
+    @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Sale s WHERE s.business.id = :businessId AND s.paymentMethod = 'CASH' AND s.createdAt >= :start AND s.createdAt <= :end")
+    BigDecimal totalCashRevenueBetween(@Param("businessId") Long businessId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Sale s WHERE s.business.id = :businessId AND s.paymentMethod != 'CASH' AND s.createdAt >= :start AND s.createdAt <= :end")
+    BigDecimal totalDigitalRevenueBetween(@Param("businessId") Long businessId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

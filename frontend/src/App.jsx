@@ -11,6 +11,7 @@ import LandingPage from './components/LandingPage';
 import SubscribePage from './components/SubscribePage';
 import AdminPanel from './components/AdminPanel';
 import InventoryPage from './components/InventoryPage';
+import Itr4FilingTool from './components/Itr4FilingTool';
 import { getCurrentUser } from './api/authApi';
 import { subscriptionApi } from './api/featureApi';
 
@@ -84,6 +85,7 @@ function App() {
           <Route path="/subscribe" element={<SubscribePage />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/itr4" element={<Itr4FilingTool />} />
         </Route>
       </Routes>
       <Toaster
