@@ -1,7 +1,8 @@
 package com.shopkeeper.sales.controller;
 
 import com.shopkeeper.sales.dto.VoiceParseRequest;
-import com.shopkeeper.sales.repository.SaleItemRepository;
+import com.shopkeeper.sales.model.InventoryItem;
+import com.shopkeeper.sales.repository.InventoryRepository;
 import com.shopkeeper.sales.repository.SaleRepository;
 import com.shopkeeper.sales.security.CustomUserDetails;
 import com.shopkeeper.sales.service.AiVoiceService;
@@ -25,7 +26,7 @@ public class VoiceSaleController {
     private SaleRepository saleRepository;
 
     @Autowired
-    private SaleItemRepository saleItemRepository;
+    private InventoryRepository inventoryRepository;
 
     @PostMapping("/voice-parse")
     public ResponseEntity<?> parseVoiceSale(@RequestBody VoiceParseRequest request) {
@@ -33,7 +34,7 @@ public class VoiceSaleController {
         Long businessId = userDetails.getBusinessId();
 
         try {
-            // Extract unique customers
+            // Extract unique customers from past sales
             List<String> distinctCustomers = saleRepository.findDistinctCustomerNamesByBusinessId(businessId);
             
             // Map strings to Customer List JSON structure
@@ -41,16 +42,16 @@ public class VoiceSaleController {
                 .map(name -> Map.<String, Object>of("id", name, "name", name))
                 .collect(Collectors.toList());
 
-            // Extract unique products
-            List<SaleItemRepository.ProductProjection> distinctProducts = saleItemRepository.findDistinctProductsByBusinessId(businessId);
+            // Extract products from actual active inventory
+            List<InventoryItem> activeInventory = inventoryRepository.findByBusinessIdAndIsActiveTrueOrderByNameAsc(businessId);
             
-            // Map products to Product List JSON structure
-            List<Map<String, Object>> productList = distinctProducts.stream()
+            // Map products to Product List JSON structure for the AI
+            List<Map<String, Object>> productList = activeInventory.stream()
                 .map(p -> Map.<String, Object>of(
-                    "id", p.getName(),
+                    "id", p.getId(),
                     "name", p.getName(),
-                    "unit", "pcs", // Defaulting as we don't have a unit table
-                    "price", p.getPrice()
+                    "unit", p.getUnit() != null ? p.getUnit() : "pcs",
+                    "price", p.getPriceInPaise() != null ? p.getPriceInPaise() / 100.0 : 0.0
                 ))
                 .collect(Collectors.toList());
 
