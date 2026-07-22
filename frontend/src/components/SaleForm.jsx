@@ -24,7 +24,15 @@ function SaleForm() {
   const transcriptRef = useRef('');
   const [aiParsing, setAiParsing] = useState(false);
 
-  const startListening = () => {
+  const recognitionRef = useRef(null);
+
+  const toggleListening = () => {
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      return;
+    }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error('Voice recognition is not supported in this browser. Try Chrome or Android.');
@@ -32,7 +40,9 @@ function SaleForm() {
     }
 
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = 'hi-IN'; // Works for Hindi and Hinglish
+    recognition.continuous = true; // Keeps listening until manually stopped
     recognition.interimResults = true;
     
     recognition.onstart = () => {
@@ -43,7 +53,7 @@ function SaleForm() {
 
     recognition.onresult = (event) => {
       let currentTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      for (let i = 0; i < event.results.length; i++) {
         currentTranscript += event.results[i][0].transcript;
       }
       setTranscript(currentTranscript);
@@ -51,9 +61,11 @@ function SaleForm() {
     };
 
     recognition.onerror = (event) => {
-      console.error(event.error);
+      if (event.error !== 'aborted') {
+        console.error(event.error);
+        toast.error('Voice recording error: ' + event.error);
+      }
       setIsListening(false);
-      toast.error('Voice recording error. Please try again.');
     };
 
     recognition.onend = async () => {
@@ -186,13 +198,14 @@ function SaleForm() {
         <h1 className="page-title">Record New Sale</h1>
         
         <button 
-          onClick={startListening} 
-          disabled={isListening || aiParsing}
+          type="button"
+          onClick={toggleListening} 
+          disabled={aiParsing}
           className={`btn ${isListening ? 'btn-danger' : 'btn-primary'}`}
           style={{ display: 'flex', alignItems: 'center', gap: '8px', animation: isListening ? 'pulse 1.5s infinite' : 'none' }}
         >
           {aiParsing ? <Loader className="spin" size={18} /> : <Mic size={18} />}
-          {aiParsing ? 'AI is thinking...' : isListening ? 'Listening...' : 'Record Voice Sale'}
+          {aiParsing ? 'AI is thinking...' : isListening ? 'Stop Recording' : 'Record Voice Sale'}
         </button>
       </div>
       
