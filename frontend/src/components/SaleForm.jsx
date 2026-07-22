@@ -81,7 +81,10 @@ function SaleForm() {
                   quantity: item.quantity || 1,
                   unitPrice: item.unit_price_used || 0
                }));
-               setItems(parsedItems);
+               setItems(prev => {
+                   const validPrevItems = prev.filter(item => item.productName.trim() !== '');
+                   return [...validPrevItems, ...parsedItems];
+               });
             }
             
             if (data.payment) {
