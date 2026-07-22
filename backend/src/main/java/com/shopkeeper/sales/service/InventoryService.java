@@ -50,6 +50,11 @@ public class InventoryService {
             item.setPriceInPaise(Math.round(priceRs * 100));
         }
 
+        Double costPriceRs = getDouble(request, "costPrice");
+        if (costPriceRs != null) {
+            item.setCostPriceInPaise(Math.round(costPriceRs * 100));
+        }
+
         return inventoryRepository.save(item);
     }
 
@@ -65,6 +70,10 @@ public class InventoryService {
         if (request.containsKey("price")) {
             Double priceRs = getDouble(request, "price");
             if (priceRs != null) item.setPriceInPaise(Math.round(priceRs * 100));
+        }
+        if (request.containsKey("costPrice")) {
+            Double costPriceRs = getDouble(request, "costPrice");
+            if (costPriceRs != null) item.setCostPriceInPaise(Math.round(costPriceRs * 100));
         }
 
         return inventoryRepository.save(item);
@@ -86,6 +95,7 @@ public class InventoryService {
             "description", item.getDescription() != null ? item.getDescription() : "",
             "unit", item.getUnit() != null ? item.getUnit() : "pcs",
             "price", item.getPriceInPaise() != null ? item.getPriceInPaise() / 100.0 : 0.0,
+            "costPrice", item.getCostPriceInPaise() != null ? item.getCostPriceInPaise() / 100.0 : 0.0,
             "quantityOnHand", item.getQuantityOnHand() != null ? item.getQuantityOnHand() : 0,
             "createdAt", item.getCreatedAt()
         );

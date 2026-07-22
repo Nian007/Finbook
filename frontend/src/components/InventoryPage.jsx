@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 const UNITS = ['pcs', 'kg', 'g', 'litre', 'ml', 'dozen', 'box', 'packet', 'bundle'];
 
-const emptyForm = { name: '', sku: '', description: '', price: '', quantityOnHand: '', unit: 'pcs' };
+const emptyForm = { name: '', sku: '', description: '', price: '', costPrice: '', quantityOnHand: '', unit: 'pcs' };
 
 export default function InventoryPage() {
   const [items, setItems] = useState([]);
@@ -36,6 +36,7 @@ export default function InventoryPage() {
       sku: item.sku || '',
       description: item.description || '',
       price: item.price !== undefined ? item.price : '',
+      costPrice: item.costPrice !== undefined ? item.costPrice : '',
       quantityOnHand: item.quantityOnHand !== undefined ? item.quantityOnHand : '',
       unit: item.unit || 'pcs',
     });
@@ -50,6 +51,7 @@ export default function InventoryPage() {
       const payload = {
         ...form,
         price: parseFloat(form.price) || 0,
+        costPrice: parseFloat(form.costPrice) || 0,
         quantityOnHand: parseInt(form.quantityOnHand) || 0,
       };
       if (editItem) {
@@ -116,7 +118,8 @@ export default function InventoryPage() {
                 <tr>
                   <th>Name</th>
                   <th>SKU</th>
-                  <th>Price</th>
+                  <th>Sell Price</th>
+                  <th>Cost Price</th>
                   <th>Qty</th>
                   <th>Unit</th>
                   <th>Actions</th>
@@ -128,6 +131,7 @@ export default function InventoryPage() {
                     <td className="item-name">{item.name}</td>
                     <td className="item-sku">{item.sku || '—'}</td>
                     <td>{formatPrice(item.price)}</td>
+                    <td>{formatPrice(item.costPrice)}</td>
                     <td>{item.quantityOnHand ?? '—'}</td>
                     <td>{item.unit || 'pcs'}</td>
                     <td className="item-actions">
@@ -157,22 +161,29 @@ export default function InventoryPage() {
               </div>
               <div className="form-row-2col">
                 <div className="form-row">
-                  <label>Price (₹)</label>
+                  <label>Sell Price (₹)</label>
                   <input id="item-price" className="input-field" type="number" min="0" step="0.01"
                     value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="0.00" />
                 </div>
+                <div className="form-row">
+                  <label>Cost Price (₹)</label>
+                  <input id="item-cost-price" className="input-field" type="number" min="0" step="0.01"
+                    value={form.costPrice} onChange={e => setForm(f => ({ ...f, costPrice: e.target.value }))} placeholder="0.00" />
+                </div>
+              </div>
+              <div className="form-row-2col">
                 <div className="form-row">
                   <label>Quantity in Stock</label>
                   <input id="item-qty" className="input-field" type="number" min="0"
                     value={form.quantityOnHand} onChange={e => setForm(f => ({ ...f, quantityOnHand: e.target.value }))} placeholder="0" />
                 </div>
-              </div>
-              <div className="form-row-2col">
                 <div className="form-row">
                   <label>SKU / Code</label>
                   <input id="item-sku" className="input-field" value={form.sku}
                     onChange={e => setForm(f => ({ ...f, sku: e.target.value }))} placeholder="e.g. CHIPS-001" />
                 </div>
+              </div>
+              <div className="form-row-2col">
                 <div className="form-row">
                   <label>Unit</label>
                   <select id="item-unit" className="input-field" value={form.unit}

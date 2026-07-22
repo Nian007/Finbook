@@ -26,6 +26,8 @@ public class InventoryItem {
     // Stored in paise to avoid floating point issues. e.g. 2000 = ₹20.00
     private Long priceInPaise;
 
+    private Long costPriceInPaise;
+
     private Integer quantityOnHand;
 
     private String unit; // pcs, kg, litre, dozen, etc.
@@ -67,6 +69,9 @@ public class InventoryItem {
 
     public Long getPriceInPaise() { return priceInPaise; }
     public void setPriceInPaise(Long priceInPaise) { this.priceInPaise = priceInPaise; }
+
+    public Long getCostPriceInPaise() { return costPriceInPaise; }
+    public void setCostPriceInPaise(Long costPriceInPaise) { this.costPriceInPaise = costPriceInPaise; }
 
     public Integer getQuantityOnHand() { return quantityOnHand; }
     public void setQuantityOnHand(Integer quantityOnHand) { this.quantityOnHand = quantityOnHand; }

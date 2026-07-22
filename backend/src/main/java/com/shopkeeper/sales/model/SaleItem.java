@@ -21,7 +21,11 @@ public class SaleItem {
     @Column(nullable = false)
     private BigDecimal unitPrice;
 
+    private BigDecimal costPrice;
+
     private BigDecimal subtotal;
+
+    private Long productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sale_id")
@@ -66,6 +70,22 @@ public class SaleItem {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public Sale getSale() {

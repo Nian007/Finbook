@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { salesApi } from '../api/salesApi';
 import { formatCurrency } from '../utils/formatters';
 
-const emptyItem = { productName: '', quantity: 1, unitPrice: 0 };
+const emptyItem = { productId: null, productName: '', quantity: 1, unitPrice: 0 };
 
 function SaleForm() {
   const navigate = useNavigate();
@@ -89,6 +89,7 @@ function SaleForm() {
             
             if (data.items && data.items.length > 0) {
                const parsedItems = data.items.map(item => ({
+                  productId: item.matched_product_id || null,
                   productName: item.matched_product_name || item.raw_spoken_item || '',
                   quantity: item.quantity || 1,
                   unitPrice: item.unit_price_used || 0
@@ -177,6 +178,7 @@ function SaleForm() {
         items: items
           .filter((item) => item.productName.trim() && item.unitPrice > 0)
           .map((item) => ({
+            productId: item.productId || null,
             productName: item.productName.trim(),
             quantity: Number(item.quantity) || 1,
             unitPrice: Number(item.unitPrice),

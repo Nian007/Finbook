@@ -28,6 +28,12 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Sale s WHERE s.business.id = :businessId")
     BigDecimal totalRevenueAllTime(@Param("businessId") Long businessId);
 
+    @Query("SELECT COALESCE(SUM(i.subtotal - (COALESCE(i.costPrice, 0) * i.quantity)), 0) FROM Sale s JOIN s.items i WHERE s.business.id = :businessId AND s.createdAt >= :start")
+    BigDecimal totalGrossProfitSince(@Param("businessId") Long businessId, @Param("start") LocalDateTime start);
+
+    @Query("SELECT COALESCE(SUM(i.subtotal - (COALESCE(i.costPrice, 0) * i.quantity)), 0) FROM Sale s JOIN s.items i WHERE s.business.id = :businessId")
+    BigDecimal totalGrossProfitAllTime(@Param("businessId") Long businessId);
+
     Optional<Sale> findByIdAndBusinessId(Long id, Long businessId);
 
     List<Sale> findTop10ByBusinessIdOrderByCreatedAtDesc(Long businessId);

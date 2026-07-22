@@ -2,11 +2,14 @@ package com.shopkeeper.sales.service;
 
 import com.shopkeeper.sales.dto.DashboardStats;
 import com.shopkeeper.sales.dto.SaleRequest;
+import com.shopkeeper.sales.model.InventoryItem;
 import com.shopkeeper.sales.model.Sale;
 import com.shopkeeper.sales.model.SaleItem;
+import com.shopkeeper.sales.repository.InventoryRepository;
 import com.shopkeeper.sales.repository.SaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.shopkeeper.sales.security.CustomUserDetails;
@@ -25,13 +28,16 @@ public class SaleService {
     @Autowired
     private SaleRepository saleRepository;
 
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
+    @Transactional
     public Sale createSale(SaleRequest request) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long businessId = userDetails.getBusinessId();
         
         Sale sale = new Sale();
         
-        // We need to fetch the Business from repo or just set the reference. Let's assume we can set a reference
         com.shopkeeper.sales.model.Business businessRef = new com.shopkeeper.sales.model.Business();
         businessRef.setId(businessId);
         sale.setBusiness(businessRef);
@@ -59,8 +65,32 @@ public class SaleService {
                 BigDecimal subtotal = itemRequest.getUnitPrice()
                         .multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
                 saleItem.setSubtotal(subtotal);
-                saleItem.setSale(sale);
+                
+                // Inventory Logic
+                if (itemRequest.getProductId() != null) {
+                    Optional<InventoryItem> invOpt = inventoryRepository.findByIdAndBusinessId(itemRequest.getProductId(), businessId);
+                    if (invOpt.isPresent()) {
+                        InventoryItem inv = invOpt.get();
+                        saleItem.setProductId(inv.getId());
+                        
+                        if (inv.getCostPriceInPaise() != null) {
+                            saleItem.setCostPrice(BigDecimal.valueOf(inv.getCostPriceInPaise()).divide(BigDecimal.valueOf(100)));
+                        } else {
+                            saleItem.setCostPrice(BigDecimal.ZERO);
+                        }
+                        
+                        if (inv.getQuantityOnHand() != null) {
+                            inv.setQuantityOnHand(inv.getQuantityOnHand() - itemRequest.getQuantity());
+                            inventoryRepository.save(inv);
+                        }
+                    } else {
+                        saleItem.setCostPrice(BigDecimal.ZERO);
+                    }
+                } else {
+                    saleItem.setCostPrice(BigDecimal.ZERO);
+                }
 
+                saleItem.setSale(sale);
                 sale.getItems().add(saleItem);
                 totalAmount = totalAmount.add(subtotal);
             }
@@ -82,7 +112,6 @@ public class SaleService {
 
     public void deleteSale(Long id) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // Should really verify it belongs to business first, but keeping simple for now
         saleRepository.findByIdAndBusinessId(id, userDetails.getBusinessId()).ifPresent(sale -> saleRepository.delete(sale));
     }
 
@@ -100,7 +129,9 @@ public class SaleService {
         BigDecimal todayRevenue = saleRepository.totalRevenueSince(businessId, todayStart);
         BigDecimal totalRevenue = saleRepository.totalRevenueAllTime(businessId);
         Long totalSalesCount = saleRepository.countSalesAllTime(businessId);
+        BigDecimal todayGrossProfit = saleRepository.totalGrossProfitSince(businessId, todayStart);
+        BigDecimal totalGrossProfit = saleRepository.totalGrossProfitAllTime(businessId);
 
-        return new DashboardStats(todaySalesCount, todayRevenue, totalRevenue, totalSalesCount);
+        return new DashboardStats(todaySalesCount, todayRevenue, totalRevenue, totalSalesCount, todayGrossProfit, totalGrossProfit);
     }
 }

@@ -7,12 +7,16 @@ public class DashboardStats {
     private BigDecimal todayRevenue;
     private BigDecimal totalRevenue;
     private Long totalSalesCount;
+    private BigDecimal todayGrossProfit;
+    private BigDecimal totalGrossProfit;
 
-    public DashboardStats(Long todaySalesCount, BigDecimal todayRevenue, BigDecimal totalRevenue, Long totalSalesCount) {
+    public DashboardStats(Long todaySalesCount, BigDecimal todayRevenue, BigDecimal totalRevenue, Long totalSalesCount, BigDecimal todayGrossProfit, BigDecimal totalGrossProfit) {
         this.todaySalesCount = todaySalesCount;
         this.todayRevenue = todayRevenue;
         this.totalRevenue = totalRevenue;
         this.totalSalesCount = totalSalesCount;
+        this.todayGrossProfit = todayGrossProfit;
+        this.totalGrossProfit = totalGrossProfit;
     }
 
     public Long getTodaySalesCount() {
@@ -39,11 +43,10 @@ public class DashboardStats {
         this.totalRevenue = totalRevenue;
     }
 
-    public Long getTotalSalesCount() {
-        return totalSalesCount;
-    }
-
-    public void setTotalSalesCount(Long totalSalesCount) {
-        this.totalSalesCount = totalSalesCount;
-    }
+    public Long getTotalSalesCount() { return totalSalesCount; }
+    public void setTotalSalesCount(Long totalSalesCount) { this.totalSalesCount = totalSalesCount; }
+    public BigDecimal getTodayGrossProfit() { return todayGrossProfit; }
+    public void setTodayGrossProfit(BigDecimal todayGrossProfit) { this.todayGrossProfit = todayGrossProfit; }
+    public BigDecimal getTotalGrossProfit() { return totalGrossProfit; }
+    public void setTotalGrossProfit(BigDecimal totalGrossProfit) { this.totalGrossProfit = totalGrossProfit; }
 }

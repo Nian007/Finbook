@@ -49,6 +49,8 @@ function Dashboard({ businessName, subStatus }) {
   const todayRevenue = stats?.todayRevenue ?? 0;
   const todaySalesCount = stats?.todaySalesCount ?? 0;
   const totalSalesCount = stats?.totalSalesCount ?? 0;
+  const todayGrossProfit = stats?.todayGrossProfit ?? 0;
+  const totalGrossProfit = stats?.totalGrossProfit ?? 0;
 
   return (
     <div className="page-container">
@@ -88,13 +90,23 @@ function Dashboard({ businessName, subStatus }) {
         </div>
         <div className="stat-card emerald">
           <div className="stat-icon emerald"><Wallet size={20} /></div>
-          <div className="stat-value">{formatCurrency(totalRevenue)}</div>
-          <div className="stat-label">Total Revenue</div>
+          <div className="stat-value">{formatCurrency(todayGrossProfit)}</div>
+          <div className="stat-label">Today's Profit</div>
         </div>
         <div className="stat-card blue">
           <div className="stat-icon blue"><TrendingUp size={20} /></div>
           <div className="stat-value">{totalSalesCount}</div>
           <div className="stat-label">Total Sales</div>
+        </div>
+        <div className="stat-card emerald">
+          <div className="stat-icon emerald"><Wallet size={20} /></div>
+          <div className="stat-value">{formatCurrency(totalRevenue)}</div>
+          <div className="stat-label">Total Revenue</div>
+        </div>
+        <div className="stat-card emerald">
+          <div className="stat-icon emerald"><Wallet size={20} /></div>
+          <div className="stat-value">{formatCurrency(totalGrossProfit)}</div>
+          <div className="stat-label">Total Profit</div>
         </div>
       </div>
 

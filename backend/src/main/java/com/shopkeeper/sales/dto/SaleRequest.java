@@ -56,6 +56,7 @@ public class SaleRequest {
         private String productName;
         private Integer quantity;
         private BigDecimal unitPrice;
+        private Long productId;
 
         public String getProductName() {
             return productName;
@@ -79,6 +80,14 @@ public class SaleRequest {
 
         public void setUnitPrice(BigDecimal unitPrice) {
             this.unitPrice = unitPrice;
+        }
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Long productId) {
+            this.productId = productId;
         }
     }
 }
