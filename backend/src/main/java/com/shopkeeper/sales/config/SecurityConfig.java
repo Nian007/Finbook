@@ -60,6 +60,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/auth/**", "/error").permitAll()
+                    .requestMatchers("/api/scan-sessions/*/pair", "/api/scan-sessions/*/add-sale", "/api/scan-sessions/*/add-inventory").permitAll()
+                    .requestMatchers("/api/vision/identify").permitAll()
                     .anyRequest().authenticated()
             );
 

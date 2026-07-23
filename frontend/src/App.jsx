@@ -12,6 +12,7 @@ import SubscribePage from './components/SubscribePage';
 import AdminPanel from './components/AdminPanel';
 import InventoryPage from './components/InventoryPage';
 import Itr4FilingTool from './components/Itr4FilingTool';
+import MobileScanner from './components/MobileScanner';
 import { getCurrentUser } from './api/authApi';
 import { subscriptionApi } from './api/featureApi';
 
@@ -75,6 +76,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={currentUser ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
         <Route path="/login" element={currentUser ? <Navigate to="/dashboard" replace /> : <BusinessLogin onLogin={handleLogin} />} />
+        <Route path="/mobile-scan" element={<MobileScanner />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedLayout currentUser={currentUser} handleLogout={handleLogout} subStatus={subStatus} />}>

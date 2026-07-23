@@ -4,6 +4,7 @@ import { Plus, Trash2, Save, ShoppingBag, Mic, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { salesApi } from '../api/salesApi';
 import { formatCurrency } from '../utils/formatters';
+import DesktopScannerPairing from './DesktopScannerPairing';
 
 const emptyItem = { productId: null, productName: '', quantity: 1, unitPrice: 0 };
 
@@ -17,6 +18,7 @@ function SaleForm() {
     notes: '',
   });
   const [items, setItems] = useState([{ ...emptyItem }]);
+  const [showScanner, setShowScanner] = useState(false);
 
   // Voice AI States
   const [isListening, setIsListening] = useState(false);
@@ -144,6 +146,19 @@ function SaleForm() {
     setItems((prev) => [...prev, { ...emptyItem }]);
   };
 
+  const handleMobileScan = (scannedData, type) => {
+    if (type !== 'Sale') return;
+    setItems(prev => {
+      const validItems = prev.filter(item => item.productName.trim() !== '');
+      return [...validItems, {
+        productId: scannedData.productId || null,
+        productName: scannedData.productName || scannedData.guess || '',
+        quantity: scannedData.quantity || 1,
+        unitPrice: scannedData.price || 0
+      }];
+    });
+  };
+
   const removeItem = (index) => {
     if (items.length === 1) return;
     setItems((prev) => prev.filter((_, i) => i !== index));
@@ -210,6 +225,18 @@ function SaleForm() {
           {aiParsing ? 'AI is thinking...' : isListening ? 'Stop Recording' : 'Record Voice Sale'}
         </button>
       </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <button className="btn" onClick={() => setShowScanner(!showScanner)}>
+          {showScanner ? 'Hide Mobile Scanner' : '📱 Scan with Phone'}
+        </button>
+      </div>
+
+      {showScanner && (
+        <div style={{ marginBottom: '20px' }}>
+          <DesktopScannerPairing onScan={handleMobileScan} />
+        </div>
+      )}
       
       {(isListening || transcript || aiParsing) && (
          <div className="card" style={{ marginBottom: '20px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6' }}>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { inventoryApi } from '../api/featureApi';
+import DesktopScannerPairing from './DesktopScannerPairing';
 import toast from 'react-hot-toast';
 
 const UNITS = ['pcs', 'kg', 'g', 'litre', 'ml', 'dozen', 'box', 'packet', 'bundle'];
@@ -13,6 +14,7 @@ export default function InventoryPage() {
   const [editItem, setEditItem] = useState(null); // null = adding new
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => { fetchItems(); }, []);
 
@@ -86,8 +88,19 @@ export default function InventoryPage() {
           <h1>Inventory</h1>
           <p>{items.length} items · Manual entry only</p>
         </div>
-        <button id="add-inventory-btn" className="btn btn-primary" onClick={openAdd}>+ Add Item</button>
+        <div>
+          <button className="btn" style={{ marginRight: '10px' }} onClick={() => setShowScanner(!showScanner)}>
+            {showScanner ? 'Hide Scanner' : '📱 Scan with Phone'}
+          </button>
+          <button id="add-inventory-btn" className="btn btn-primary" onClick={openAdd}>+ Add Item</button>
+        </div>
       </div>
+
+      {showScanner && (
+        <div style={{ marginBottom: '20px' }}>
+          <DesktopScannerPairing />
+        </div>
+      )}
 
       <div className="inventory-toolbar">
         <input
