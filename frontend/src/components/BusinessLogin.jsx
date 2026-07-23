@@ -110,70 +110,6 @@ const BusinessLogin = ({ onLogin }) => {
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
               </div>
-              <hr style={{ margin: '20px 0', borderColor: 'rgba(255,255,255,0.1)' }} />
-              <h4 style={{ color: 'white', marginBottom: '10px' }}>Tax & ITR-4 Details</h4>
-              <div className="login-input-group">
-                <textarea
-                  placeholder="Full Address"
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  rows="2"
-                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-              <div className="login-input-group" style={{ display: 'flex', gap: '10px' }}>
-                <input
-                  type="text"
-                  placeholder="PIN Code"
-                  required
-                  pattern="[0-9]{6}"
-                  value={formData.pinCode}
-                  onChange={(e) => setFormData({...formData, pinCode: e.target.value})}
-                  style={{ flex: 1 }}
-                />
-                <select
-                  value={formData.businessStatus}
-                  onChange={(e) => setFormData({...formData, businessStatus: e.target.value})}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                >
-                  <option value="Individual">Individual</option>
-                  <option value="HUF">HUF</option>
-                  <option value="Firm">Firm</option>
-                </select>
-              </div>
-              <div className="login-input-group" style={{ display: 'flex', gap: '10px' }}>
-                <input
-                  type="text"
-                  placeholder="PAN (e.g. ABCDE1234F)"
-                  required
-                  pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
-                  title="5 letters, 4 digits, 1 letter"
-                  value={formData.pan}
-                  onChange={(e) => setFormData({...formData, pan: e.target.value.toUpperCase()})}
-                  style={{ flex: 1 }}
-                />
-                <input
-                  type="text"
-                  placeholder="Aadhaar (12 digits)"
-                  required
-                  pattern="[0-9]{12}"
-                  title="12 digit Aadhaar number"
-                  value={formData.aadhaar}
-                  onChange={(e) => setFormData({...formData, aadhaar: e.target.value})}
-                  style={{ flex: 1 }}
-                />
-              </div>
-              <div className="login-input-group">
-                <input
-                  type="date"
-                  placeholder="Date of Birth"
-                  required
-                  value={formData.dob}
-                  onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                />
-                <span style={{ fontSize: '0.8rem', color: 'gray' }}>Date of Birth / Incorporation</span>
-              </div>
               <div className="login-input-group">
                 <input
                   type="text"
@@ -191,36 +127,6 @@ const BusinessLogin = ({ onLogin }) => {
                   required
                   value={formData.natureOfBusiness}
                   onChange={(e) => setFormData({...formData, natureOfBusiness: e.target.value})}
-                />
-              </div>
-              <hr style={{ margin: '20px 0', borderColor: 'rgba(255,255,255,0.1)' }} />
-              <h4 style={{ color: 'white', marginBottom: '10px' }}>Bank Details (For Refund)</h4>
-              <div className="login-input-group">
-                <input
-                  type="text"
-                  placeholder="Bank Name"
-                  required
-                  value={formData.bankName}
-                  onChange={(e) => setFormData({...formData, bankName: e.target.value})}
-                />
-              </div>
-              <div className="login-input-group" style={{ display: 'flex', gap: '10px' }}>
-                <input
-                  type="text"
-                  placeholder="Account Number"
-                  required
-                  value={formData.bankAccountNumber}
-                  onChange={(e) => setFormData({...formData, bankAccountNumber: e.target.value})}
-                  style={{ flex: 1 }}
-                />
-                <input
-                  type="text"
-                  placeholder="IFSC Code"
-                  required
-                  pattern="^[A-Z]{4}0[A-Z0-9]{6}$"
-                  value={formData.bankIfsc}
-                  onChange={(e) => setFormData({...formData, bankIfsc: e.target.value.toUpperCase()})}
-                  style={{ flex: 1 }}
                 />
               </div>
             </>

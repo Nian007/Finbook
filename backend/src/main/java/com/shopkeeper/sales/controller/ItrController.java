@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/itr")
-@CrossOrigin(origins = "*")
 public class ItrController {
 
     @Autowired

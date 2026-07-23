@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, AlertTriangle, FileText, CheckCircle, HelpCircle } from 'lucide-react';
-import axios from 'axios';
+import { itrApi } from '../api/featureApi';
 import toast from 'react-hot-toast';
 
 function Itr4FilingTool() {
@@ -11,6 +11,18 @@ function Itr4FilingTool() {
   const [otherIncome, setOtherIncome] = useState({
     interestIncome: 0,
     salaryIncome: 0
+  });
+
+  const [taxDetails, setTaxDetails] = useState({
+    pan: '',
+    aadhaar: '',
+    dob: '',
+    businessStatus: 'Individual',
+    address: '',
+    pinCode: '',
+    bankName: '',
+    bankAccountNumber: '',
+    bankIfsc: ''
   });
 
   const [taxesPaid, setTaxesPaid] = useState({
@@ -33,13 +45,21 @@ function Itr4FilingTool() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/itr/data?financialYearStart=${financialYear}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await itrApi.getData(financialYear);
       setData(response.data);
       if (response.data.business) {
         setVerification(prev => ({ ...prev, name: response.data.business.ownerName }));
+        setTaxDetails({
+          pan: response.data.business.pan || '',
+          aadhaar: response.data.business.aadhaar || '',
+          dob: response.data.business.dob || '',
+          businessStatus: response.data.business.businessStatus || 'Individual',
+          address: response.data.business.address || '',
+          pinCode: response.data.business.pinCode || '',
+          bankName: response.data.business.bankName || '',
+          bankAccountNumber: response.data.business.bankAccountNumber || '',
+          bankIfsc: response.data.business.bankIfsc || ''
+        });
       }
     } catch (err) {
       toast.error('Failed to load ITR data');
@@ -65,12 +85,12 @@ function Itr4FilingTool() {
       PersonalInfo: {
         AssesseeName: data.business.ownerName,
         BusinessName: data.business.businessName,
-        PAN: data.business.pan,
-        Aadhaar: data.business.aadhaar,
-        DOB: data.business.dob,
-        Status: data.business.businessStatus,
-        Address: data.business.address,
-        PinCode: data.business.pinCode,
+        PAN: taxDetails.pan,
+        Aadhaar: taxDetails.aadhaar,
+        DOB: taxDetails.dob,
+        Status: taxDetails.businessStatus,
+        Address: taxDetails.address,
+        PinCode: taxDetails.pinCode,
         Mobile: data.business.phone
       },
       FilingStatus: {
@@ -96,9 +116,9 @@ function Itr4FilingTool() {
       OtherIncome: otherIncome,
       TaxesPaid: taxesPaid,
       BankDetails: {
-        BankName: data.business.bankName,
-        AccountNumber: data.business.bankAccountNumber,
-        IFSC: data.business.bankIfsc
+        BankName: taxDetails.bankName,
+        AccountNumber: taxDetails.bankAccountNumber,
+        IFSC: taxDetails.bankIfsc
       },
       Verification: verification
     };
@@ -106,7 +126,7 @@ function Itr4FilingTool() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(itrJson, null, 2));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `ITR4_${data.business.pan}_AY2026-27.json`);
+    downloadAnchorNode.setAttribute("download", `ITR4_${taxDetails.pan || 'DRAFT'}_AY2026-27.json`);
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
@@ -174,10 +194,34 @@ function Itr4FilingTool() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '0.9rem' }}>
               <div><strong>Name:</strong> {data.business.ownerName}</div>
               <div><strong>Business:</strong> {data.business.businessName}</div>
-              <div><strong>PAN:</strong> {data.business.pan}</div>
-              <div><strong>Aadhaar:</strong> {data.business.aadhaar}</div>
-              <div><strong>Status:</strong> {data.business.businessStatus}</div>
-              <div><strong>DOB:</strong> {data.business.dob}</div>
+              <div className="form-group" style={{ marginBottom: '0' }}>
+                <label className="form-label">PAN</label>
+                <input type="text" value={taxDetails.pan} onChange={e => setTaxDetails({...taxDetails, pan: e.target.value.toUpperCase()})} placeholder="ABCDE1234F" style={{ padding: '6px', width: '100%' }} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '0' }}>
+                <label className="form-label">Aadhaar</label>
+                <input type="text" value={taxDetails.aadhaar} onChange={e => setTaxDetails({...taxDetails, aadhaar: e.target.value})} placeholder="12 digits" style={{ padding: '6px', width: '100%' }} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '0' }}>
+                <label className="form-label">Status</label>
+                <select value={taxDetails.businessStatus} onChange={e => setTaxDetails({...taxDetails, businessStatus: e.target.value})} style={{ padding: '6px', width: '100%' }}>
+                  <option value="Individual">Individual</option>
+                  <option value="HUF">HUF</option>
+                  <option value="Firm">Firm</option>
+                </select>
+              </div>
+              <div className="form-group" style={{ marginBottom: '0' }}>
+                <label className="form-label">DOB / Incorporation</label>
+                <input type="date" value={taxDetails.dob} onChange={e => setTaxDetails({...taxDetails, dob: e.target.value})} style={{ padding: '6px', width: '100%' }} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '0', gridColumn: 'span 2' }}>
+                <label className="form-label">Full Address</label>
+                <input type="text" value={taxDetails.address} onChange={e => setTaxDetails({...taxDetails, address: e.target.value})} style={{ padding: '6px', width: '100%' }} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '0' }}>
+                <label className="form-label">PIN Code</label>
+                <input type="text" value={taxDetails.pinCode} onChange={e => setTaxDetails({...taxDetails, pinCode: e.target.value})} style={{ padding: '6px', width: '100%' }} />
+              </div>
             </div>
             <p className="text-secondary" style={{ fontSize: '0.8rem', marginTop: '10px' }}>
               Make sure PAN format is valid (5 letters, 4 numbers, 1 letter) and Aadhaar is 12 digits.
@@ -246,6 +290,22 @@ function Itr4FilingTool() {
             <div className="form-group">
               <label className="form-label">Advance Tax Paid</label>
               <input type="number" value={taxesPaid.advanceTax} onChange={e => setTaxesPaid({...taxesPaid, advanceTax: Number(e.target.value)})} />
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="form-section-title">G. Bank Details (For Refund)</h3>
+            <div className="form-group">
+              <label className="form-label">Bank Name</label>
+              <input type="text" value={taxDetails.bankName} onChange={e => setTaxDetails({...taxDetails, bankName: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Account Number</label>
+              <input type="text" value={taxDetails.bankAccountNumber} onChange={e => setTaxDetails({...taxDetails, bankAccountNumber: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">IFSC Code</label>
+              <input type="text" value={taxDetails.bankIfsc} onChange={e => setTaxDetails({...taxDetails, bankIfsc: e.target.value.toUpperCase()})} />
             </div>
           </div>
 

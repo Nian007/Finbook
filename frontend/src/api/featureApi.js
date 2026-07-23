@@ -64,3 +64,9 @@ export const inventoryApi = {
     update: (id, data) => api.put(`/api/inventory/${id}`, data),
     delete: (id) => api.delete(`/api/inventory/${id}`),
 };
+
+// ─── ITR API ──────────────────────────────────────────────────────────────────
+
+export const itrApi = {
+    getData: (year) => api.get(`/api/itr/data?financialYearStart=${year}`)
+};
