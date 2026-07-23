@@ -2,7 +2,7 @@ package com.shopkeeper.sales.controller;
 
 import com.shopkeeper.sales.model.InventoryItem;
 import com.shopkeeper.sales.model.ScanSession;
-import com.shopkeeper.sales.repository.InventoryItemRepository;
+import com.shopkeeper.sales.repository.InventoryRepository;
 import com.shopkeeper.sales.repository.ScanSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class VisionController {
     private ScanSessionRepository scanSessionRepository;
     
     @Autowired
-    private InventoryItemRepository inventoryItemRepository;
+    private InventoryRepository inventoryRepository;
 
     @PostMapping("/identify")
     public ResponseEntity<?> identifyProduct(
@@ -42,7 +42,7 @@ public class VisionController {
         String aiCategory = "Packaged Food";
 
         // MOCK FUZZY SEARCH against existing inventory using the AI's guess
-        List<InventoryItem> matchedItems = inventoryItemRepository.search("Parle");
+        List<InventoryItem> matchedItems = inventoryRepository.searchByBusinessIdAndName(session.getBusiness().getId(), "Parle");
 
         return ResponseEntity.ok(Map.of(
             "guess", aiGuess,
