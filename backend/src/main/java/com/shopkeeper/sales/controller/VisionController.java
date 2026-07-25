@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class VisionController {
     private InventoryRepository inventoryRepository;
 
     @PostMapping("/identify")
+    @Transactional
     public ResponseEntity<?> identifyProduct(
             @RequestParam("image") MultipartFile image,
             @RequestParam("token") String token) {
