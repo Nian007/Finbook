@@ -16,12 +16,14 @@ function Dashboard({ businessName, subStatus }) {
   const [stats, setStats] = useState(null);
   const [recentSales, setRecentSales] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [daysFilter, setDaysFilter] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       try {
         const [statsRes, salesRes] = await Promise.all([
-          salesApi.getStats(),
+          salesApi.getStats(daysFilter),
           salesApi.getAll(),
         ]);
         setStats(statsRes.data);
@@ -33,7 +35,7 @@ function Dashboard({ businessName, subStatus }) {
       }
     }
     fetchData();
-  }, []);
+  }, [daysFilter]);
 
   if (loading) {
     return (
@@ -62,9 +64,21 @@ function Dashboard({ businessName, subStatus }) {
         </div>
       )}
 
-      <div className="page-header animate-fade-in-up">
-        <p className="page-greeting">{getGreeting()}{businessName ? `, ${businessName}` : ''}</p>
-        <h1 className="page-title">Dashboard</h1>
+      <div className="page-header animate-fade-in-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <p className="page-greeting">{getGreeting()}{businessName ? `, ${businessName}` : ''}</p>
+          <h1 className="page-title">Dashboard</h1>
+        </div>
+        <select 
+          className="form-control" 
+          style={{ width: '150px', backgroundColor: 'var(--card-bg)' }}
+          value={daysFilter}
+          onChange={(e) => setDaysFilter(Number(e.target.value))}
+        >
+          <option value={0}>Today</option>
+          <option value={7}>Last 7 Days</option>
+          <option value={30}>Last 30 Days</option>
+        </select>
       </div>
 
       <div className="hero-card animate-fade-in-up delay-1">
@@ -81,17 +95,17 @@ function Dashboard({ businessName, subStatus }) {
         <div className="stat-card blue">
           <div className="stat-icon blue"><ShoppingCart size={20} /></div>
           <div className="stat-value">{todaySalesCount}</div>
-          <div className="stat-label">Today's Sales</div>
+          <div className="stat-label">{daysFilter === 0 ? "Today's Sales" : `Last ${daysFilter} Days Sales`}</div>
         </div>
         <div className="stat-card gold">
           <div className="stat-icon gold"><IndianRupee size={20} /></div>
           <div className="stat-value">{formatCurrency(todayRevenue)}</div>
-          <div className="stat-label">Today's Revenue</div>
+          <div className="stat-label">{daysFilter === 0 ? "Today's Revenue" : `Last ${daysFilter} Days Revenue`}</div>
         </div>
         <div className="stat-card emerald">
           <div className="stat-icon emerald"><Wallet size={20} /></div>
           <div className="stat-value">{formatCurrency(todayGrossProfit)}</div>
-          <div className="stat-label">Today's Profit</div>
+          <div className="stat-label">{daysFilter === 0 ? "Today's Profit" : `Last ${daysFilter} Days Profit`}</div>
         </div>
         <div className="stat-card blue">
           <div className="stat-icon blue"><TrendingUp size={20} /></div>

@@ -2828,4 +2828,246 @@ select {
 }
 .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
+/* Revolut Style Landing Page */
+.landing-container.revolut-style {
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.landing-nav-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-6) var(--space-8);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo-icon-minimal {
+  background: var(--text-primary);
+  color: #000;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-icon-minimal svg {
+  color: #000 !important;
+}
+
+.btn-minimal {
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+}
+
+.btn-pill {
+  background: #fff;
+  color: #000;
+  border-radius: 9999px;
+  padding: var(--space-2) var(--space-6);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-pill:hover {
+  transform: scale(1.05);
+}
+.btn-pill.large {
+  padding: var(--space-4) var(--space-8);
+  font-size: 1.1rem;
+}
+.btn-pill.dark-btn {
+  background: #222;
+  color: #fff;
+}
+
+.hero-section-modern {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px var(--space-6) 60px;
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.hero-title-massive {
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--space-6);
+}
+
+.text-highlight {
+  color: #a3a3a3;
+}
+
+.hero-subtitle-minimal {
+  font-size: 1.25rem;
+  color: #a3a3a3;
+  max-width: 600px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.6;
+}
+
+.hero-graphic {
+  position: relative;
+  margin-top: 80px;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+.abstract-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+}
+.shape-1 {
+  width: 300px;
+  height: 300px;
+  background: rgba(59, 130, 246, 0.4);
+  top: 0;
+  left: 50%;
+  transform: translateX(-80%);
+}
+.shape-2 {
+  width: 250px;
+  height: 250px;
+  background: rgba(38, 194, 129, 0.3);
+  bottom: 0;
+  right: 50%;
+  transform: translateX(80%);
+}
+
+.floating-ui-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(25, 25, 25, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: var(--space-6);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #a3a3a3;
+  margin-bottom: 12px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #26C281;
+  border-radius: 50%;
+}
+.card-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.card-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 60px;
+}
+.bar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px 4px 0 0;
+}
+.bar.b1 { height: 40%; }
+.bar.b2 { height: 60%; }
+.bar.b3 { height: 30%; }
+.bar.b4 { height: 80%; }
+.bar.b5 { height: 100%; background: #26C281; }
+
+.features-minimal {
+  padding: 80px var(--space-6);
+  background: #0a0a0a;
+}
+.features-grid-modern {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-8);
+}
+.feature-cell h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.feature-cell p {
+  color: #888;
+  line-height: 1.5;
+}
+.icon-wrapper {
+  width: 48px;
+  height: 48px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  color: #fff;
+}
+
+.cta-minimal {
+  padding: 100px var(--space-6);
+  text-align: center;
+  background: #000;
+}
+.cta-minimal h2 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  margin-bottom: var(--space-8);
+  letter-spacing: -0.02em;
+}
+
+.footer-minimal {
+  padding: var(--space-8) var(--space-6);
+  border-top: 1px solid #1a1a1a;
+  color: #666;
+}
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-links {
+  display: flex;
+  gap: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .hero-section-modern {
+    padding: 60px var(--space-4) 40px;
+  }
+}
+
 

@@ -9,6 +9,7 @@ public class SaleRequest {
     private String customerPhone;
     private String paymentMethod;
     private String notes;
+    private BigDecimal amountPaid;
     private List<ItemRequest> items;
 
     public String getCustomerName() {
@@ -41,6 +42,14 @@ public class SaleRequest {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public BigDecimal getAmountPaid() {
+        return amountPaid;
+    }
+
+    public void setAmountPaid(BigDecimal amountPaid) {
+        this.amountPaid = amountPaid;
     }
 
     public List<ItemRequest> getItems() {

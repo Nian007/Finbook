@@ -15,6 +15,7 @@ function SaleForm() {
     customerName: '',
     customerPhone: '',
     paymentMethod: 'CASH',
+    amountPaid: '',
     notes: '',
   });
   const [items, setItems] = useState([{ ...emptyItem }]);
@@ -199,6 +200,11 @@ function SaleForm() {
             unitPrice: Number(item.unitPrice),
           })),
       };
+      
+      if (form.amountPaid !== '') {
+        payload.amountPaid = Number(form.amountPaid);
+      }
+      
       const response = await salesApi.create(payload);
       toast.success('Sale recorded successfully');
       navigate(`/sales/${response.data.id}?autoPrint=true`);
@@ -352,6 +358,17 @@ function SaleForm() {
                   <option value="UPI">UPI</option>
                   <option value="OTHER">Other</option>
                 </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Amount Paid (Optional)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.amountPaid}
+                  onChange={(e) => updateForm('amountPaid', e.target.value)}
+                  placeholder={`Default: Full (₹${grandTotal})`}
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">Notes</label>

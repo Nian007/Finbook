@@ -29,6 +29,11 @@ public class SaleController {
         return ResponseEntity.ok(saleService.getAllSales());
     }
 
+    @GetMapping("/outstanding")
+    public ResponseEntity<List<Sale>> getOutstandingSales() {
+        return ResponseEntity.ok(saleService.getOutstandingSales());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Sale> getSaleById(@PathVariable Long id) {
         return saleService.getSaleById(id)
@@ -47,8 +52,14 @@ public class SaleController {
         return ResponseEntity.ok(saleService.searchSales(query));
     }
 
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<Sale> recordPayment(@PathVariable Long id, @RequestBody java.util.Map<String, java.math.BigDecimal> payload) {
+        java.math.BigDecimal amount = payload.get("amount");
+        return ResponseEntity.ok(saleService.recordPayment(id, amount));
+    }
+
     @GetMapping("/stats")
-    public ResponseEntity<DashboardStats> getDashboardStats() {
-        return ResponseEntity.ok(saleService.getDashboardStats());
+    public ResponseEntity<DashboardStats> getDashboardStats(@RequestParam(required = false) Integer days) {
+        return ResponseEntity.ok(saleService.getDashboardStats(days));
     }
 }

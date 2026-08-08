@@ -6,13 +6,13 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import SalesList from './components/SalesList';
 import SaleForm from './components/SaleForm';
+import OutstandingSales from './components/OutstandingSales';
 import Invoice from './components/Invoice';
 import BusinessLogin from './components/BusinessLogin';
 import LandingPage from './components/LandingPage';
 import SubscribePage from './components/SubscribePage';
 import AdminPanel from './components/AdminPanel';
 import InventoryPage from './components/InventoryPage';
-import Itr4FilingTool from './components/Itr4FilingTool';
 import MobileScanner from './components/MobileScanner';
 import { getCurrentUser } from './api/authApi';
 import { subscriptionApi } from './api/featureApi';
@@ -113,11 +113,11 @@ function App() {
           <Route path="/dashboard" element={<Dashboard businessName={currentUser?.businessName} subStatus={subStatus} />} />
           <Route path="/new-sale" element={<SaleForm />} />
           <Route path="/sales" element={<SalesList />} />
+          <Route path="/outstanding" element={<OutstandingSales />} />
           <Route path="/sales/:id" element={<Invoice currentUser={currentUser} />} />
           <Route path="/subscribe" element={<SubscribePage />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/itr4" element={<Itr4FilingTool />} />
         </Route>
       </Routes>
       <Toaster

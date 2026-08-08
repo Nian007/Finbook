@@ -32,6 +32,12 @@ public class Sale {
 
     private BigDecimal totalAmount;
 
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal amountPaid = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private String paymentStatus = "PAID"; // "PAID", "UNPAID", "PARTIAL"
+
     @Column(columnDefinition = "TEXT")
     private String notes;
 
@@ -102,6 +108,22 @@ public class Sale {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public BigDecimal getAmountPaid() {
+        return amountPaid;
+    }
+
+    public void setAmountPaid(BigDecimal amountPaid) {
+        this.amountPaid = amountPaid;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public String getNotes() {

@@ -97,6 +97,18 @@ public class SaleService {
         }
 
         sale.setTotalAmount(totalAmount);
+        
+        BigDecimal amountPaid = request.getAmountPaid() != null ? request.getAmountPaid() : totalAmount;
+        sale.setAmountPaid(amountPaid);
+        
+        if (amountPaid.compareTo(BigDecimal.ZERO) == 0) {
+            sale.setPaymentStatus("UNPAID");
+        } else if (amountPaid.compareTo(totalAmount) < 0) {
+            sale.setPaymentStatus("PARTIAL");
+        } else {
+            sale.setPaymentStatus("PAID");
+        }
+        
         return saleRepository.save(sale);
     }
 
@@ -120,16 +132,48 @@ public class SaleService {
         return saleRepository.search(userDetails.getBusinessId(), query);
     }
 
-    public DashboardStats getDashboardStats() {
+    public List<Sale> getOutstandingSales() {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return saleRepository.findAllByBusinessIdAndPaymentStatusNotOrderByCreatedAtDesc(userDetails.getBusinessId(), "PAID");
+    }
+
+    @Transactional
+    public Sale recordPayment(Long id, BigDecimal paymentAmount) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Sale sale = saleRepository.findByIdAndBusinessId(id, userDetails.getBusinessId())
+                .orElseThrow(() -> new RuntimeException("Sale not found"));
+        
+        BigDecimal newAmountPaid = sale.getAmountPaid().add(paymentAmount);
+        if (newAmountPaid.compareTo(sale.getTotalAmount()) > 0) {
+            newAmountPaid = sale.getTotalAmount(); // cap at total
+        }
+        sale.setAmountPaid(newAmountPaid);
+        
+        if (newAmountPaid.compareTo(sale.getTotalAmount()) >= 0) {
+            sale.setPaymentStatus("PAID");
+        } else if (newAmountPaid.compareTo(BigDecimal.ZERO) > 0) {
+            sale.setPaymentStatus("PARTIAL");
+        } else {
+            sale.setPaymentStatus("UNPAID");
+        }
+        
+        return saleRepository.save(sale);
+    }
+
+    public DashboardStats getDashboardStats(Integer days) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long businessId = userDetails.getBusinessId();
         
-        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
-        Long todaySalesCount = saleRepository.countSalesSince(businessId, todayStart);
-        BigDecimal todayRevenue = saleRepository.totalRevenueSince(businessId, todayStart);
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        if (days != null && days > 0) {
+            start = LocalDate.now().minusDays(days).atStartOfDay();
+        }
+        
+        Long todaySalesCount = saleRepository.countSalesSince(businessId, start);
+        BigDecimal todayRevenue = saleRepository.totalRevenueSince(businessId, start);
         BigDecimal totalRevenue = saleRepository.totalRevenueAllTime(businessId);
         Long totalSalesCount = saleRepository.countSalesAllTime(businessId);
-        BigDecimal todayGrossProfit = saleRepository.totalGrossProfitSince(businessId, todayStart);
+        BigDecimal todayGrossProfit = saleRepository.totalGrossProfitSince(businessId, start);
         BigDecimal totalGrossProfit = saleRepository.totalGrossProfitAllTime(businessId);
 
         return new DashboardStats(todaySalesCount, todayRevenue, totalRevenue, totalSalesCount, todayGrossProfit, totalGrossProfit);

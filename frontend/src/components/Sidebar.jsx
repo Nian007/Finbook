@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, ClipboardList, Receipt, LogOut, Package, CreditCard, ShieldCheck, FileText, X } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, ClipboardList, Receipt, LogOut, Package, CreditCard, ShieldCheck, FileText, X, BookOpen } from 'lucide-react';
 
 function Sidebar({ businessName, onLogout, role, subStatus, isOpen, onClose }) {
   const isSuperAdmin = role === 'super_admin';
@@ -38,6 +38,10 @@ function Sidebar({ businessName, onLogout, role, subStatus, isOpen, onClose }) {
           <span className="nav-link-icon"><Package size={18} /></span>
           Inventory
         </NavLink>
+        <NavLink to="/outstanding" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+          <span className="nav-link-icon"><BookOpen size={18} /></span>
+          Khata Book
+        </NavLink>
         <NavLink to="/subscribe" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
           <span className="nav-link-icon"><CreditCard size={18} /></span>
           Subscription
@@ -49,10 +53,6 @@ function Sidebar({ businessName, onLogout, role, subStatus, isOpen, onClose }) {
             Admin Panel
           </NavLink>
         )}
-        <NavLink to="/itr4" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <span className="nav-link-icon"><FileText size={18} /></span>
-          ITR-4 Tool
-        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

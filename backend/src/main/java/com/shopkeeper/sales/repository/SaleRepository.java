@@ -12,6 +12,8 @@ import java.util.Optional;
 
 public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<Sale> findAllByBusinessIdOrderByCreatedAtDesc(Long businessId);
+    
+    List<Sale> findAllByBusinessIdAndPaymentStatusNotOrderByCreatedAtDesc(Long businessId, String paymentStatus);
 
     @Query("SELECT s FROM Sale s WHERE s.business.id = :businessId AND (LOWER(s.invoiceNumber) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(s.customerName) LIKE LOWER(CONCAT('%', :query, '%')))")
     List<Sale> search(@Param("businessId") Long businessId, @Param("query") String query);
