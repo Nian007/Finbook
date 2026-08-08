@@ -125,8 +125,8 @@ export default function InventoryPage() {
           </div>
         )
         : (
-          <div className="inventory-table-wrap">
-            <table className="inventory-table">
+          <div className="data-table-container">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Name</th>

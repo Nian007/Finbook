@@ -96,71 +96,73 @@ function SalesList() {
 
       {filtered.length > 0 ? (
         <div className="card animate-fade-in-up delay-2">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Invoice #</th>
-                <th>Customer</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Payment</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((sale, index) => (
-                <tr
-                  key={sale.id}
-                  onClick={() => navigate(`/sales/${sale.id}`)}
-                  style={{ cursor: 'pointer' }}
-                  className={`animate-fade-in-up delay-${Math.min(index + 1, 6)}`}
-                >
-                  <td style={{ fontWeight: 600 }}>{sale.invoiceNumber}</td>
-                  <td>{sale.customerName}</td>
-                  <td>{sale.items?.length ?? 0}</td>
-                  <td>{formatCurrency(sale.totalAmount)}</td>
-                  <td>
-                    <span className={`badge ${getPaymentMethodColor(sale.paymentMethod)}`}>
-                      {getPaymentMethodLabel(sale.paymentMethod)}
-                    </span>
-                  </td>
-                  <td>{formatDate(sale.createdAt)}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      <button
-                        className="btn-icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/sales/${sale.id}`);
-                        }}
-                        title="View invoice"
-                      >
-                        <Eye size={16} />
-                      </button>
-                      <button
-                        className="btn-icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/sales/${sale.id}?autoPrint=true`);
-                        }}
-                        title="Print invoice"
-                      >
-                        <Printer size={16} />
-                      </button>
-                      <button
-                        className="btn-icon btn-danger"
-                        onClick={(e) => handleDelete(e, sale.id)}
-                        title="Delete sale"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
+          <div className="data-table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Payment</th>
+                  <th>Date</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((sale, index) => (
+                  <tr
+                    key={sale.id}
+                    onClick={() => navigate(`/sales/${sale.id}`)}
+                    style={{ cursor: 'pointer' }}
+                    className={`animate-fade-in-up delay-${Math.min(index + 1, 6)}`}
+                  >
+                    <td style={{ fontWeight: 600 }}>{sale.invoiceNumber}</td>
+                    <td>{sale.customerName}</td>
+                    <td>{sale.items?.length ?? 0}</td>
+                    <td>{formatCurrency(sale.totalAmount)}</td>
+                    <td>
+                      <span className={`badge ${getPaymentMethodColor(sale.paymentMethod)}`}>
+                        {getPaymentMethodLabel(sale.paymentMethod)}
+                      </span>
+                    </td>
+                    <td>{formatDate(sale.createdAt)}</td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button
+                          className="btn-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/sales/${sale.id}`);
+                          }}
+                          title="View invoice"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          className="btn-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/sales/${sale.id}?autoPrint=true`);
+                          }}
+                          title="Print invoice"
+                        >
+                          <Printer size={16} />
+                        </button>
+                        <button
+                          className="btn-icon btn-danger"
+                          onClick={(e) => handleDelete(e, sale.id)}
+                          title="Delete sale"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className="card animate-fade-in-up delay-2">

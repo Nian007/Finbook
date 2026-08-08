@@ -119,36 +119,38 @@ function Dashboard({ businessName, subStatus }) {
         </div>
 
         {recentSales.length > 0 ? (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Invoice</th>
-                <th>Customer</th>
-                <th>Amount</th>
-                <th>Payment</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentSales.map((sale) => (
-                <tr
-                  key={sale.id}
-                  onClick={() => navigate(`/sales/${sale.id}`)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td style={{ fontWeight: 600 }}>{sale.invoiceNumber}</td>
-                  <td>{sale.customerName}</td>
-                  <td>{formatCurrency(sale.totalAmount)}</td>
-                  <td>
-                    <span className={`badge ${getPaymentMethodColor(sale.paymentMethod)}`}>
-                      {getPaymentMethodLabel(sale.paymentMethod)}
-                    </span>
-                  </td>
-                  <td>{formatDate(sale.createdAt)}</td>
+          <div className="data-table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                  <th>Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentSales.map((sale) => (
+                  <tr
+                    key={sale.id}
+                    onClick={() => navigate(`/sales/${sale.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td style={{ fontWeight: 600 }}>{sale.invoiceNumber}</td>
+                    <td>{sale.customerName}</td>
+                    <td>{formatCurrency(sale.totalAmount)}</td>
+                    <td>
+                      <span className={`badge ${getPaymentMethodColor(sale.paymentMethod)}`}>
+                        {getPaymentMethodLabel(sale.paymentMethod)}
+                      </span>
+                    </td>
+                    <td>{formatDate(sale.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="empty-state">
             <div className="empty-icon"><Plus size={32} /></div>
