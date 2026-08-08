@@ -14,7 +14,7 @@ import SubscribePage from './components/SubscribePage';
 import AdminPanel from './components/AdminPanel';
 import InventoryPage from './components/InventoryPage';
 import MobileScanner from './components/MobileScanner';
-import { getCurrentUser } from './api/authApi';
+import { getCurrentUser, logout } from './api/authApi';
 import { subscriptionApi } from './api/featureApi';
 
 // Routes that are accessible even without an active subscription
@@ -94,10 +94,11 @@ function App() {
     navigate('/dashboard');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout();
     setCurrentUser(null);
     setSubStatus(null);
-    navigate('/login');
+    navigate('/');
   };
 
   return (

@@ -3070,4 +3070,183 @@ select {
   }
 }
 
+/* ============================================================
+   Auth Screen — Revolut Style
+   ============================================================ */
+.auth-screen {
+  min-height: 100vh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 48px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.auth-content {
+  position: relative;
+}
+
+.auth-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.auth-back:hover {
+  color: #fff;
+}
+
+.auth-title {
+  font-size: clamp(2rem, 6vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 40px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #666;
+  font-weight: 600;
+}
+
+.auth-field input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 10px 0;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.2s;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+.auth-field input:focus {
+  border-bottom-color: #fff;
+}
+.auth-field input::placeholder {
+  color: #444;
+}
+
+.auth-forgot-link {
+  text-align: right;
+  margin-top: -12px;
+}
+.auth-forgot-link button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+.auth-forgot-link button:hover {
+  color: #fff;
+}
+
+.auth-submit {
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 9999px;
+  padding: 16px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+.auth-submit:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 4px 20px rgba(255,255,255,0.15);
+}
+.auth-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 32px;
+}
+.auth-switch button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.auth-switch button:hover {
+  color: #fff;
+}
+
+/* Status Badges for Khata Book */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.status-badge.paid {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.status-badge.partial {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+.status-badge.unpaid {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Override old login styles so they don't bleed */
+.login-screen { display: none; }
 
