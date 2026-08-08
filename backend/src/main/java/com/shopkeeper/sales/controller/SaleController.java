@@ -59,7 +59,9 @@ public class SaleController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<DashboardStats> getDashboardStats(@RequestParam(required = false) Integer days) {
-        return ResponseEntity.ok(saleService.getDashboardStats(days));
+    public ResponseEntity<DashboardStats> getDashboardStats(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        return ResponseEntity.ok(saleService.getDashboardStats(startDate, endDate));
     }
 }

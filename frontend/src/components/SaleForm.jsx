@@ -346,12 +346,36 @@ function SaleForm() {
         <div className="card">
           <div className="form-section">
             <h3 className="form-section-title">Payment Details</h3>
+            <div style={{ marginBottom: '16px', display: 'flex', gap: '10px' }}>
+              <button 
+                type="button"
+                className={`btn ${form.amountPaid === 0 ? 'btn-danger' : 'btn-ghost'}`}
+                onClick={() => {
+                  updateForm('amountPaid', 0);
+                  updateForm('paymentMethod', 'OTHER');
+                  updateForm('notes', form.notes ? form.notes + '\n[PAY LATER]' : '[PAY LATER]');
+                }}
+              >
+                ⏱️ Mark as Pay Later
+              </button>
+              <button 
+                type="button"
+                className={`btn ${form.amountPaid !== 0 ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => {
+                  updateForm('amountPaid', '');
+                  updateForm('paymentMethod', 'CASH');
+                }}
+              >
+                💵 Full Payment Now
+              </button>
+            </div>
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Payment Method</label>
                 <select
                   value={form.paymentMethod}
                   onChange={(e) => updateForm('paymentMethod', e.target.value)}
+                  disabled={form.amountPaid === 0}
                 >
                   <option value="CASH">Cash</option>
                   <option value="CARD">Card</option>
@@ -366,8 +390,9 @@ function SaleForm() {
                   min="0"
                   step="0.01"
                   value={form.amountPaid}
-                  onChange={(e) => updateForm('amountPaid', e.target.value)}
+                  onChange={(e) => updateForm('amountPaid', e.target.value === '' ? '' : Number(e.target.value))}
                   placeholder={`Default: Full (₹${grandTotal})`}
+                  disabled={form.amountPaid === 0}
                 />
               </div>
               <div className="form-group">

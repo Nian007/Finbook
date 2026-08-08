@@ -160,20 +160,26 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-    public DashboardStats getDashboardStats(Integer days) {
+    public DashboardStats getDashboardStats(String startDate, String endDate) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long businessId = userDetails.getBusinessId();
         
-        LocalDateTime start = LocalDate.now().atStartOfDay();
-        if (days != null && days > 0) {
-            start = LocalDate.now().minusDays(days).atStartOfDay();
+        LocalDateTime start;
+        LocalDateTime end;
+
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            start = LocalDate.parse(startDate).atStartOfDay();
+            end = LocalDate.parse(endDate).atTime(23, 59, 59);
+        } else {
+            start = LocalDate.now().atStartOfDay();
+            end = LocalDate.now().atTime(23, 59, 59);
         }
         
-        Long todaySalesCount = saleRepository.countSalesSince(businessId, start);
-        BigDecimal todayRevenue = saleRepository.totalRevenueSince(businessId, start);
+        Long todaySalesCount = saleRepository.countSalesBetween(businessId, start, end);
+        BigDecimal todayRevenue = saleRepository.totalRevenueBetween(businessId, start, end);
         BigDecimal totalRevenue = saleRepository.totalRevenueAllTime(businessId);
         Long totalSalesCount = saleRepository.countSalesAllTime(businessId);
-        BigDecimal todayGrossProfit = saleRepository.totalGrossProfitSince(businessId, start);
+        BigDecimal todayGrossProfit = saleRepository.totalGrossProfitBetween(businessId, start, end);
         BigDecimal totalGrossProfit = saleRepository.totalGrossProfitAllTime(businessId);
 
         return new DashboardStats(todaySalesCount, todayRevenue, totalRevenue, totalSalesCount, todayGrossProfit, totalGrossProfit);

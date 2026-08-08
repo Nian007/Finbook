@@ -18,20 +18,20 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT s FROM Sale s WHERE s.business.id = :businessId AND (LOWER(s.invoiceNumber) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(s.customerName) LIKE LOWER(CONCAT('%', :query, '%')))")
     List<Sale> search(@Param("businessId") Long businessId, @Param("query") String query);
 
-    @Query("SELECT COUNT(s) FROM Sale s WHERE s.business.id = :businessId AND s.createdAt >= :start")
-    Long countSalesSince(@Param("businessId") Long businessId, @Param("start") LocalDateTime start);
+    @Query("SELECT COUNT(s) FROM Sale s WHERE s.business.id = :businessId AND s.createdAt >= :start AND s.createdAt <= :end")
+    Long countSalesBetween(@Param("businessId") Long businessId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("SELECT COUNT(s) FROM Sale s WHERE s.business.id = :businessId")
     Long countSalesAllTime(@Param("businessId") Long businessId);
 
-    @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Sale s WHERE s.business.id = :businessId AND s.createdAt >= :start")
-    BigDecimal totalRevenueSince(@Param("businessId") Long businessId, @Param("start") LocalDateTime start);
+    @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Sale s WHERE s.business.id = :businessId AND s.createdAt >= :start AND s.createdAt <= :end")
+    BigDecimal totalRevenueBetween(@Param("businessId") Long businessId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Sale s WHERE s.business.id = :businessId")
     BigDecimal totalRevenueAllTime(@Param("businessId") Long businessId);
 
-    @Query("SELECT COALESCE(SUM(i.subtotal - (COALESCE(i.costPrice, 0) * i.quantity)), 0) FROM Sale s JOIN s.items i WHERE s.business.id = :businessId AND s.createdAt >= :start")
-    BigDecimal totalGrossProfitSince(@Param("businessId") Long businessId, @Param("start") LocalDateTime start);
+    @Query("SELECT COALESCE(SUM(i.subtotal - (COALESCE(i.costPrice, 0) * i.quantity)), 0) FROM Sale s JOIN s.items i WHERE s.business.id = :businessId AND s.createdAt >= :start AND s.createdAt <= :end")
+    BigDecimal totalGrossProfitBetween(@Param("businessId") Long businessId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("SELECT COALESCE(SUM(i.subtotal - (COALESCE(i.costPrice, 0) * i.quantity)), 0) FROM Sale s JOIN s.items i WHERE s.business.id = :businessId")
     BigDecimal totalGrossProfitAllTime(@Param("businessId") Long businessId);

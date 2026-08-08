@@ -63,6 +63,12 @@ export const salesApi = {
   search: (query) => api.get(`/search?query=${encodeURIComponent(query)}`),
   getOutstanding: () => api.get('/outstanding'),
   recordPayment: (id, amount) => api.post(`/${id}/pay`, { amount }),
-  getStats: (days) => api.get(`/stats${days ? `?days=${days}` : ''}`),
+  getStats: (startDate, endDate) => {
+    let url = '/stats';
+    if (startDate && endDate) {
+      url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+    return api.get(url);
+  },
   parseVoice: (transcript) => api.post('/voice-parse', { transcript })
 };
