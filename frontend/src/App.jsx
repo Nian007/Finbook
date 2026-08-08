@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import SalesList from './components/SalesList';
@@ -21,11 +22,15 @@ const OPEN_ROUTES = ['/subscribe', '/admin'];
 
 function ProtectedLayout({ currentUser, handleLogout, subStatus }) {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar whenever the route changes
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   if (!currentUser) return <Navigate to="/login" replace />;
 
-  // Lockout: if subscription is not ACTIVE or TRIAL, redirect to subscribe
-  // (unless user is on an open route or is super_admin)
   const isSuperAdmin = currentUser.role === 'super_admin';
   const isOnOpenRoute = OPEN_ROUTES.some(r => location.pathname.startsWith(r));
   const isBlocked = subStatus && !subStatus.isAllowed && !isSuperAdmin && !isOnOpenRoute;
@@ -34,8 +39,34 @@ function ProtectedLayout({ currentUser, handleLogout, subStatus }) {
 
   return (
     <div className="app-layout">
-      <Sidebar businessName={currentUser.businessName} onLogout={handleLogout}
-        role={currentUser.role} subStatus={subStatus} />
+      {/* Mobile top bar with hamburger */}
+      <header className="mobile-topbar">
+        <button
+          className="hamburger-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu size={22} />
+        </button>
+        <span className="mobile-topbar-title">Finbook</span>
+        <div style={{ width: 40 }} /> {/* spacer to center title */}
+      </header>
+
+      {/* Overlay behind sidebar on mobile */}
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      <Sidebar
+        businessName={currentUser.businessName}
+        onLogout={handleLogout}
+        role={currentUser.role}
+        subStatus={subStatus}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
       <main className="main-content">
         <Outlet />
       </main>
@@ -48,7 +79,6 @@ function App() {
   const [subStatus, setSubStatus] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch subscription status whenever user changes
   useEffect(() => {
     if (currentUser) {
       subscriptionApi.getStatus()

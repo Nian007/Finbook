@@ -234,6 +234,76 @@ h6 { font-size: var(--text-base); font-weight: 600; }
   background: transparent;
 }
 
+/* Mobile top bar — hidden on desktop */
+.mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 200;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+}
+
+.mobile-topbar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #C9A227, #E8D48B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hamburger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.hamburger-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* Sidebar close button — only shows on mobile */
+.sidebar-close-btn {
+  display: none;
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast);
+  z-index: 10;
+}
+
+.sidebar-close-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -1369,27 +1439,45 @@ select {
 .delay-5 { animation-delay: 300ms; }
 .delay-6 { animation-delay: 360ms; }
 
-/* ------------------------------------------------------------ 
+/* ============================================================
    21. Responsive
-   ------------------------------------------------------------ */
+   ============================================================ */
+
+/* Tablet: 2-column stats, sidebar still visible */
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* Tablet/phablet: hide sidebar, show hamburger */
 @media (max-width: 1024px) {
+  .mobile-topbar {
+    display: flex;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+
   .sidebar {
     transform: translateX(-100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 300;
+    padding-top: 56px; /* below mobile topbar */
   }
 
   .sidebar.open {
     transform: translateX(0);
+    box-shadow: 4px 0 40px rgba(0,0,0,0.7);
   }
 
   .main-content {
     margin-left: 0;
-    padding: var(--space-6) var(--space-5);
+    padding: calc(56px + var(--space-5)) var(--space-4) var(--space-6);
   }
 
   .form-row {
@@ -1406,9 +1494,10 @@ select {
   }
 }
 
+/* Mobile: single column, tighter padding */
 @media (max-width: 768px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .hero-amount {
@@ -1416,7 +1505,7 @@ select {
   }
 
   .hero-card {
-    padding: var(--space-6);
+    padding: var(--space-5);
   }
 
   .invoice-parties {
@@ -1425,15 +1514,15 @@ select {
   }
 
   .invoice-card {
-    padding: var(--space-6);
-  }
-
-  .main-content {
     padding: var(--space-4);
   }
 
+  .main-content {
+    padding: calc(56px + var(--space-4)) var(--space-3) var(--space-5);
+  }
+
   .card {
-    padding: var(--space-5);
+    padding: var(--space-4);
   }
 
   .invoice-header {
@@ -1444,19 +1533,55 @@ select {
   .invoice-meta {
     text-align: left;
   }
+
+  .page-title {
+    font-size: var(--text-xl);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-5);
+  }
 }
 
+/* Small phone: single column stats */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-amount {
+    font-size: var(--text-xl);
+  }
+
+  .main-content {
+    padding: calc(56px + var(--space-3)) var(--space-3) var(--space-4);
+  }
+
+  .btn {
+    font-size: var(--text-sm);
+    padding: 10px 16px;
+  }
+}
+
+/* Sidebar overlay — covers content when sidebar is open on mobile */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
-  z-index: 99;
+  z-index: 250;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .sidebar-overlay.visible {
   display: block;
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ------------------------------------------------------------ 

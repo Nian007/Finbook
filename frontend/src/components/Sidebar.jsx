@@ -1,11 +1,16 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, ClipboardList, Receipt, LogOut, Package, CreditCard, ShieldCheck, FileText } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, ClipboardList, Receipt, LogOut, Package, CreditCard, ShieldCheck, FileText, X } from 'lucide-react';
 
-function Sidebar({ businessName, onLogout, role, subStatus }) {
+function Sidebar({ businessName, onLogout, role, subStatus, isOpen, onClose }) {
   const isSuperAdmin = role === 'super_admin';
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      {/* Close button — only visible on mobile */}
+      <button className="sidebar-close-btn" onClick={onClose} aria-label="Close menu">
+        <X size={20} />
+      </button>
+
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon">
           <Receipt size={20} />
@@ -52,7 +57,6 @@ function Sidebar({ businessName, onLogout, role, subStatus }) {
 
       <div className="sidebar-footer">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Subscription status chip */}
           {subStatus && (
             <div className={`sub-chip sub-chip--${subStatus.status?.toLowerCase()}`}>
               {subStatus.status === 'ACTIVE' || subStatus.status === 'TRIAL'
