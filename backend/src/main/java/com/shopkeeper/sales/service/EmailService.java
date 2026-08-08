@@ -26,7 +26,7 @@ public class EmailService {
             System.out.println("Email sent to " + to);
         } catch (Exception e) {
             System.err.println("Failed to send email to " + to + ": " + e.getMessage());
-            throw new RuntimeException("Failed to send OTP email. Check backend SMTP settings.");
+            throw new RuntimeException("Email Failed: " + e.getMessage());
         }
     }
 }
